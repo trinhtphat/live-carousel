@@ -4,11 +4,11 @@ Tạo carousel mà mỗi slide là một video có chuyển động, âm thanh v
 
 ## Xem demo
 
-[![Xem demo Live Carousel: Edit từ số 0](media/demo-preview.gif)](media/demo-carousel.mp4)
+https://github.com/user-attachments/assets/2ae5f935-f42b-4e05-8f8c-081a410d37d3
 
-[Phát video demo MP4 có âm thanh](media/demo-carousel.mp4) · [Xem poster tĩnh](media/demo-poster.jpg)
+Bấm **Play** để xem video ngay trong README. [Mở MP4 trực tiếp](media/demo-carousel.mp4) · [Xem poster tĩnh](media/demo-poster.jpg)
 
-Preview 12 giây ở trên được cắt từ **bốn slide MP4 đã render** của carousel “Edit từ số 0”, với CTA “comment để nhận bộ kit auto”. GIF giúp xem chuyển động ngay trong README; MP4 là bản xem liên tục có âm thanh. Demo minh họa luồng không có ảnh nguồn: chọn hướng từ `gpt-image-2-style-library`, tạo asset minh họa, dựng chuyển động bằng Premium Motion Video và kiểm tra contact sheet, seam, audio. CTA là nội dung minh họa; repo không kèm hệ thống tự gửi kit qua bình luận.
+Video 12 giây ở trên được cắt từ **bốn slide MP4 đã render** của carousel “Edit từ số 0”, với CTA “comment để nhận bộ kit auto”. Demo minh họa luồng không có ảnh nguồn: chọn hướng từ `gpt-image-2-style-library`, tạo asset minh họa, dựng chuyển động bằng Premium Motion Video và kiểm tra contact sheet, seam, audio. CTA là nội dung minh họa; repo không kèm hệ thống tự gửi kit qua bình luận.
 
 `SKILL.md` chứa **Core Logic**: Role → Context → Rules → Workflow → Output Format. `adapters/` hướng dẫn nạp skill theo nền tảng. Skill này nay kết nối được với **Premium Motion Video** của bạn: dùng thẩm mỹ/chuyển động theo brand và toolkit Premium để render từng slide, tạo contact sheet, kiểm tra pop; giữ quy tắc carousel và ảnh gốc. Toolkit Premium là dependency riêng, được chỉ bằng `PREMIUM_MOTION_TOOLKIT`, không đóng gói trong ZIP này. Backend HyperFrames cũ vẫn dùng được. Xuất MP4 cần quyền đọc file và chạy lệnh; chat chỉ có văn bản chỉ soạn được brief/storyboard/copy.
 
