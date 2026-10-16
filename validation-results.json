@@ -1,0 +1,11 @@
+{
+  "python_files": 34,
+  "manifest_assets": 56,
+  "font_glyph_checks": [
+    "HankenGrotesk[wght].ttf",
+    "BricolageGrotesque[opsz,wdth,wght].ttf",
+    "Fraunces-Italic[SOFT,WONK,opsz,wght].ttf",
+    "IBMPlexMono-SemiBold.ttf"
+  ],
+  "json": "pass"
+}

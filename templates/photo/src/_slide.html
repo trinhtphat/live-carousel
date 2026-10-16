@@ -27,6 +27,7 @@
           <div id="accentLayer" class="layer"></div>
           <div id="shineLayer" class="layer"></div>
           <div id="subjectLayer" class="layer"></div>
+          <div id="overLayer" class="layer"></div>
           <div id="fx" class="layer"></div>
         </div>
         <div class="vignette" id="vig"></div>
@@ -90,6 +91,10 @@
             subject.style.transformOrigin = "50% 100%";
             document.getElementById("subjectLayer").appendChild(subject);
           }
+          // type printed over the subject: its original pixels, static, above the cut-out (see prep_photo.py)
+          if (GEO.subject && GEO.over_subject) {
+            PH.masked(document.getElementById("overLayer"), "assets/over.png", "url(assets/bg.jpg) 0 0 / 100% 100% no-repeat");
+          }
           const fx = document.getElementById("fx");
           const motes = PH.motes(fx, MOTES, 11, {
             colors: ["#ffffff", A2],
@@ -111,6 +116,11 @@
           function render(t) {
             // env is 0 at frame 0 and at the loop point, so frame 0 is exactly the user's image
             const env = 0.5 * (1 - Math.cos((Math.PI * 2 * t) / DUR));
+            // Repaint/cutout masks are approximate: hide them at rest so the base image
+            // alone defines frame zero and the loop endpoint.
+            ["sky", "ext", "faceLayer", "accentLayer", "subjectLayer", "overLayer"].forEach((id) => {
+              document.getElementById(id).style.opacity = String(Math.min(1, env * 8));
+            });
             cam(t);
             if (sky) sky(t);
             leak(t, 0.55 * env);

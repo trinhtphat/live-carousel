@@ -1,0 +1,13 @@
+{
+  "mode": "score",
+  "instrumental": true,
+  "caption": "Sunny surf pop instrumental, 120 BPM, major key, bright, warm and feel-good, a summer morning at the beach. Clean jangly electric guitar with spring reverb playing a catchy, happy melody, warm round melodic bass, soft punchy live drums with a gentle snare, shaker and soft tambourine, no harsh cymbals, no crash, bright Rhodes piano chords, light hand claps, airy warm pad, distant ocean waves. A simple four-chord progression that repeats every four bars (I - V - vi - IV) the whole way through. Steady, consistent groove from the very first bar to the end, no intro and no breakdown, the guitar melody changes every eight bars. Smooth, mellow, polished modern production, soft rounded high end, never harsh, never distorted. Instrumental, no vocals.",
+  "lyrics": "[Verse - full band groove from the first beat, jangly surf guitar melody, warm bass, soft drums]\n\n[Chorus - brighter and lifted, catchy guitar hook, hand claps, Rhodes chords]\n\n[Verse - full band groove, new guitar melody]\n\n[Chorus - brighter and lifted, catchy guitar hook, hand claps]\n\n[Outro - full band groove continues]",
+  "bpm": 120,
+  "timesignature": 4,
+  "duration": 54,
+  "target_duration": 50,
+  "seeds": [11, 23, 47, 89],
+  "fps": 30,
+  "lm": "acestep-5Hz-lm-0.6B"
+}

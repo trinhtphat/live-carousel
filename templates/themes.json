@@ -1,18 +1,134 @@
 {
   "cobalt": {
     "about": "The house look: saturated cobalt world, orange accent, cream type. Default.",
-    "colors": { "hero": "#2041f2", "hero-hi": "#3a5cff", "hero-deep": "#1530c8", "paper": "#fff3e0", "accent": "#ff6a1f", "accent-hi": "#ff9a5c", "accent-deep": "#e4500d", "ink": "#0c1236" }
+    "colors": {
+      "hero": "#2041f2",
+      "hero-hi": "#3a5cff",
+      "hero-deep": "#1530c8",
+      "paper": "#fff3e0",
+      "accent": "#ff6a1f",
+      "accent-hi": "#ff9a5c",
+      "accent-deep": "#e4500d",
+      "ink": "#0c1236"
+    }
   },
   "tomato": {
     "about": "Warm and loud: tomato red world, lemon accent, cream type. Food, lifestyle, hot takes.",
-    "colors": { "hero": "#d93a26", "hero-hi": "#ec5638", "hero-deep": "#a82a18", "paper": "#fff4e2", "accent": "#ffc531", "accent-hi": "#ffe07a", "accent-deep": "#e0a100", "ink": "#2b0d08" }
+    "colors": {
+      "hero": "#d93a26",
+      "hero-hi": "#ec5638",
+      "hero-deep": "#a82a18",
+      "paper": "#fff4e2",
+      "accent": "#ffc531",
+      "accent-hi": "#ffe07a",
+      "accent-deep": "#e0a100",
+      "ink": "#2b0d08"
+    }
   },
   "forest": {
     "about": "Calm and premium: deep green world, orange accent, bone type. Finance, wellness, slow topics.",
-    "colors": { "hero": "#1f6a4c", "hero-hi": "#2c8460", "hero-deep": "#144a35", "paper": "#f5efdf", "accent": "#ff7a2e", "accent-hi": "#ffa66b", "accent-deep": "#db5a12", "ink": "#0a231a" }
+    "colors": {
+      "hero": "#1f6a4c",
+      "hero-hi": "#2c8460",
+      "hero-deep": "#144a35",
+      "paper": "#f5efdf",
+      "accent": "#ff7a2e",
+      "accent-hi": "#ffa66b",
+      "accent-deep": "#db5a12",
+      "ink": "#0a231a"
+    }
   },
   "noir": {
     "about": "Editorial dark: charcoal world, orange accent, warm white type. Tech, AI, serious tone.",
-    "colors": { "hero": "#1b1b21", "hero-hi": "#2c2c35", "hero-deep": "#0e0e12", "paper": "#f3eee5", "accent": "#ff5b2e", "accent-hi": "#ff8e66", "accent-deep": "#d63f15", "ink": "#050507" }
+    "colors": {
+      "hero": "#1b1b21",
+      "hero-hi": "#2c2c35",
+      "hero-deep": "#0e0e12",
+      "paper": "#f3eee5",
+      "accent": "#ff5b2e",
+      "accent-hi": "#ff8e66",
+      "accent-deep": "#d63f15",
+      "ink": "#050507"
+    }
+  },
+  "viral-hooks-cream": {
+    "about": "Owner Viral Hooks editorial palette; confirm in production brief.",
+    "colors": {
+      "hero": "#F2EEE5",
+      "hero-hi": "#F2EEE5",
+      "hero-deep": "#F2EEE5",
+      "paper": "#282128",
+      "accent": "#CA695E",
+      "accent-hi": "#CA695E",
+      "accent-deep": "#CA695E",
+      "ink": "#F2EEE5"
+    },
+    "typography": {
+      "display": "Hanken Grotesk",
+      "serif": "Instrument Serif",
+      "mono": "IBM Plex Mono",
+      "body": "Hanken Grotesk"
+    },
+    "design_system": "viral-hooks-editorial"
+  },
+  "viral-hooks-lime": {
+    "about": "Owner Viral Hooks editorial palette; confirm in production brief.",
+    "colors": {
+      "hero": "#DCF16B",
+      "hero-hi": "#DCF16B",
+      "hero-deep": "#DCF16B",
+      "paper": "#172A29",
+      "accent": "#CA695E",
+      "accent-hi": "#CA695E",
+      "accent-deep": "#CA695E",
+      "ink": "#DCF16B"
+    },
+    "typography": {
+      "display": "Bricolage Grotesque",
+      "serif": "Instrument Serif",
+      "mono": "IBM Plex Mono",
+      "body": "Hanken Grotesk"
+    },
+    "design_system": "viral-hooks-editorial"
+  },
+  "viral-hooks-teal": {
+    "about": "Owner Viral Hooks editorial palette; confirm in production brief.",
+    "colors": {
+      "hero": "#153B3B",
+      "hero-hi": "#153B3B",
+      "hero-deep": "#153B3B",
+      "paper": "#F2EEE5",
+      "accent": "#CBE77C",
+      "accent-hi": "#CBE77C",
+      "accent-deep": "#CBE77C",
+      "ink": "#153B3B"
+    },
+    "typography": {
+      "display": "Hanken Grotesk",
+      "serif": "Instrument Serif",
+      "mono": "IBM Plex Mono",
+      "body": "Hanken Grotesk"
+    },
+    "design_system": "viral-hooks-editorial"
+  },
+  "viral-hooks-plum": {
+    "about": "Owner Viral Hooks editorial palette; confirm in production brief.",
+    "colors": {
+      "hero": "#352136",
+      "hero-hi": "#352136",
+      "hero-deep": "#352136",
+      "paper": "#F3EDE5",
+      "accent": "#DB7760",
+      "accent-hi": "#DB7760",
+      "accent-deep": "#DB7760",
+      "ink": "#352136"
+    },
+    "typography": {
+      "display": "Hanken Grotesk",
+      "serif": "Instrument Serif",
+      "mono": "IBM Plex Mono",
+      "body": "Hanken Grotesk"
+    },
+    "design_system": "viral-hooks-editorial"
   }
 }

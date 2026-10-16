@@ -1,0 +1,10 @@
+#!/bin/sh
+# Python for this engine's tools (numpy + Pillow; + rembg after setup.sh --cutout). setup.sh decides which one:
+# a system python3 that already has numpy + Pillow, or a private env in ~/.motion-carousels/venv.
+V="${MC_HOME:-$HOME/.motion-carousels}/venv"
+if [ -x "$V/bin/python" ]; then exec "$V/bin/python" "$@"; fi
+if [ -x "$V/Scripts/python.exe" ]; then exec "$V/Scripts/python.exe" "$@"; fi
+for p in python3 python; do
+  if command -v "$p" >/dev/null 2>&1 && "$p" -c "import numpy, PIL" 2>/dev/null; then exec "$p" "$@"; fi
+done
+echo "No Python with numpy + Pillow yet: run  bash $(cd "$(dirname "$0")" && pwd)/setup.sh" >&2; exit 1

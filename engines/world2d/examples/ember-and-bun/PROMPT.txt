@@ -1,0 +1,34 @@
+Build me a 6-slide Instagram carousel for a restaurant, using full motion graphics. I want this to look like a high-end animated ad from a top creative agency, not a static post with a few elements sliding around. Go all out.
+
+THE BRAND
+- Restaurant name: "Ember & Bun", a premium smash burger spot
+- Campaign: launching a new burger called "The Inferno" (double smash patty, melted cheddar, crispy onions, jalapeños, smoky chili sauce, toasted brioche bun)
+- Price: $14.99
+- Vibe: bold, hot, smoky, premium. Colors: deep black, fiery orange, ember red, warm cream. Big chunky bold typography.
+
+FORMAT
+- Each slide is 1080x1350 (Instagram 4:5 portrait)
+- Build all 6 slides in one HTML file, side by side, so I can preview them as one wide strip AND view each slide individually
+- Use HTML, CSS, and JavaScript (canvas, SVG, or GSAP-style animation is fine)
+- Every animation should loop smoothly so each slide can be screen-recorded as a video
+- Make the carousel SEAMLESS: elements should cross the edges between slides so swiping feels like one continuous scene, not 6 separate images
+
+THE 6 SLIDES
+1. HOOK: Pitch black screen. A spark ignites, then flames burst up and the words "SOMETHING HOT IS COMING" burn into view letter by letter. Embers float upward. A glowing arrow hints to swipe.
+2. THE BUILD BEGINS: The bottom brioche bun drops in from above and bounces with weight. The smash patty slams down on it with a shockwave, sizzling particles, and rising steam.
+3. LAYERS: Melted cheddar drips down over the patty in a slow, gooey animation. Crispy onions and jalapeños rain down and land with satisfying bounces. Each ingredient gets a small animated label that pops in.
+4. THE SAUCE: Smoky chili sauce swirls and pours across the burger in a liquid motion, then the top bun drops and the whole burger squishes slightly on impact. Smoke drifts across the edge into the next slide.
+5. THE REVEAL: The finished burger slowly rotates or floats in a heroic shot with a glowing fiery rim light. The name "THE INFERNO" slams onto the screen with a camera shake, heat-distortion shimmer, and flying embers.
+6. CALL TO ACTION: Price "$14.99" counts up or stamps down with impact. "AVAILABLE NOW" pulses in. Add "Ember & Bun" logo text and "Order now, link in bio" with an animated button that glows and pulses.
+
+MOTION REQUIREMENTS
+- Use real easing (bounces, overshoot, squash and stretch), not linear movement
+- Layer the depth: background, midground, and foreground elements moving at different speeds for a parallax feel
+- Add particle effects: embers, sparks, steam, smoke
+- Add impact moments: camera shake, flashes, shockwaves when things land
+- Typography must animate too (letters dropping, burning in, stamping, glowing), never just fading in
+- Every slide should have at least 3 things moving at once so it never feels static
+- Draw the burger and ingredients yourself with SVG or canvas shapes, stylized and appetizing
+
+QUALITY BAR
+Before you finish, review every slide and ask: "Would this stop someone scrolling on Instagram?" If any slide feels flat, simple, or like just one thing moving, push it further. Do not settle for basic fades and slides. I want people to watch the whole thing twice.

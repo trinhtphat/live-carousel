@@ -1,24 +1,12 @@
-# Adapter: ChatGPT / Custom GPTs
+# Adapter: GPT / ChatGPT
 
-## Nạp skill
+Attach the portable skill files and ask the assistant to read SKILL.md. Chat instructions alone do not provide shell access. Use a tool-enabled runtime for source generation and rendering.
 
-1. Trong GPT builder, đặt phần thân `SKILL.md` (từ `# Live Carousel — Core Logic`) vào **Instructions**. Nếu giới hạn ô nhập không đủ, giữ Role, Context, Rules, Workflow, Output Format và chuyển phần chi tiết tham chiếu sang Knowledge.
-2. Tải các file `references/*.md` cần cho mode dự định vào **Knowledge**. Instructions quy định hành vi; Knowledge là tài liệu tham khảo. Không cần tải các file font hay mã render vào Knowledge nếu phiên chỉ lập kế hoạch.
-   Nếu muốn áp dụng thẩm mỹ của Premium Motion Video, tải thêm `premium-motion-video/SKILL.md` và các reference liên quan vào Knowledge, rồi yêu cầu GPT dùng nó theo hợp đồng carousel trong `SKILL.md`.
-   Nếu user không có ảnh và muốn dùng thư viện phong cách, đưa thêm `gpt-image-2-style-library/SKILL.md` cùng reference phong cách liên quan vào Knowledge. Thư viện giúp chọn style và viết prompt; cần công cụ tạo ảnh riêng để xuất ảnh.
-3. Khi dùng ChatGPT thông thường, dán `SKILL.md` vào đầu chat và đính kèm brief/ảnh. Yêu cầu model xác nhận nó có quyền đọc/ghi file và chạy shell hay không trước khi hứa xuất video.
+Use the same English core and four modes. Reply in the user's language; confirm on-video language in the brief. Read references/model-selection.md for model advice. Keep assets, manifests, fonts, licenses, scripts and engine paths relative to the skill/project. Never assume a private Premium toolkit, paid connector or local absolute path exists on another machine.
 
-## Prompt mẫu
+Follow topic selection and brief approval gates, preserving prior user choices. Read references/audio-integration.md before editing audio: mandatory manifest, BGM/SFX stems, visual triggers, subtle default, explicit custom style and peak normalization.
 
-```text
-Áp dụng Live Carousel Core Logic cho idea "[idea]".
-Trước tiên, đề xuất 5–10 chủ đề carousel khác nhau để tôi chọn.
-Sau khi tôi chọn, hỏi tỷ lệ video, tone màu và ngôn ngữ đầu ra;
-đưa brief để tôi duyệt. Chỉ sau khi tôi duyệt mới làm storyboard,
-tài sản hình ảnh và render nếu môi trường hỗ trợ. Ghi rõ đầu ra nào
-đã thực sự được render.
-```
+On Windows, use a Python interpreter with numpy/opencv and Node/ffmpeg/ffprobe available in the same environment. POSIX setup wrappers require Git Bash/WSL; portable Python scaffolds can be invoked directly. Install only dependencies for the chosen engine. Runtime checks on one platform do not prove execution on another.
 
-## Điều kiện thực thi
-
-Một Custom GPT có Instructions/Knowledge không mặc nhiên có môi trường chạy local với Node, ffmpeg, Python hoặc quyền ghi vào máy người dùng. Dùng một runtime có các quyền đó để chạy `scripts/`. Không đưa API key hay dữ liệu riêng vào prompt công khai.
+Prompt example:
+"Use live-carousel for [idea]. Preserve my approved brand and language. Propose topics if necessary, then present a production brief for approval. Use Subtle/Smooth audio unless I request another profile. Render only when your tools support it and report the actual artifacts and checks."

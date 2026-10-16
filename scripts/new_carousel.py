@@ -50,7 +50,11 @@ def main():
         shutil.copy2(c / f, dest / "shared" / f)
     for f in (c / "fonts").iterdir():
         shutil.copy2(f, dest / "shared/fonts" / f.name)
-    shutil.copy2(c / "audio/lc_audio.py", dest / "audio/lc_audio.py")
+    for helper in ("lc_audio.py", "project_audio.py"):
+        shutil.copy2(c / "audio" / helper, dest / "audio" / helper)
+    shutil.copy2(SKILL / "scripts/audio_pipeline.py", dest / "audio/audio_pipeline.py")
+    shutil.copy2(SKILL / "sfx_manifest.json", dest / "sfx_manifest.json")
+    shutil.copytree(SKILL / "assets/sfx", dest / "assets/sfx", dirs_exist_ok=True)
 
     m = T / a.mode
     if a.mode == "motion":
@@ -96,7 +100,14 @@ def main():
     }
     (dest / "package.json").write_text(json.dumps(pkg, indent=2) + "\n")
     (dest / "theme.json").write_text(json.dumps({"name": a.theme, **themes[a.theme]}, indent=2) + "\n")
-    carousel = {"title": title, "handle": a.handle, "caption": a.caption, "mode": a.mode, "slides": slides}
+    carousel = {"title": title, "handle": a.handle, "caption": a.caption, "mode": a.mode, "slides": slides, "audio": {"profile": "subtle", "custom_style_requested": False}}
+    if a.mode == "motion":
+        carousel["visual_triggers"] = {
+            "01-hook": {"ball-contact": 0.5, "headline-flip": 2.0, "drop": 2.5},
+            "02-easing": {"ball-land": 0.34, "easing-finish": 2.0},
+            "03-weight": {"first-bounce": 1.0, "launch": 6.45},
+            "04-cta": {"ball-land": 0.5, "snap": 1.0, "post-click": 3.0}
+        }
     if a.mode == "photo":
         # the cover hits early (people decide in half a second); the rest land on the downbeat of bar 2
         carousel["cues"] = {

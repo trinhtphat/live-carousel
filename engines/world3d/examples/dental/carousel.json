@@ -1,0 +1,15 @@
+{
+ "title": "PEARL LAB \u2014 SMILE, ENGINEERED (dental practice)",
+ "html": "dist/pearl-lab-smile.html",
+ "slides": [
+  "01-smile",
+  "02-aligners",
+  "03-implant",
+  "04-whitening",
+  "05-shine",
+  "06-book"
+ ],
+ "loop": 8,
+ "fps": 30,
+ "bpm": 120
+}

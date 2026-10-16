@@ -1,9 +1,8 @@
 """lc_audio: loop-exact sound design for live carousels. Needs numpy and ffmpeg, nothing paid.
 
-Everything is synthesized: drums, bass, pad, bounces, whooshes, ticks. Named one-shot effects
-("pop", "click", "impact-bass-1" ...) come from the free HyperFrames SFX pack when it is installed
-(Pixabay licence, ships with the media-use skill). Otherwise a synthesized stand-in is used, so a
-project always renders.
+Legacy synthesis primitives only. External-library autodiscovery has been removed.
+Production exports must use audio_pipeline.render_audio for manifest validation,
+brief profile gating, trigger mapping, separated stems and normalized mixing.
 
 Typical slide:
     bus = Bus(sec + 3)                 # 3 s of headroom so tails can ring past the loop point
@@ -25,13 +24,6 @@ BPM = 120
 BEAT = 60 / BPM
 rng = np.random.default_rng(7)
 
-_SFX_DIRS = [
-    os.environ.get("LC_SFX_DIR", ""),
-    "~/.claude/skills/media-use/audio/assets/sfx",
-    "~/.agents/skills/media-use/audio/assets/sfx",
-    "~/.codex/skills/media-use/audio/assets/sfx",
-    "~/.cursor/skills/media-use/audio/assets/sfx",
-]
 CACHE = Path.cwd() / ".sfx-cache"
 
 
@@ -431,25 +423,13 @@ def _synth_sfx(name):
     raise KeyError(f"unknown effect '{name}'")
 
 
-def _find_sfx(name):
-    for d in _SFX_DIRS:
-        if not d:
-            continue
-        for ext in (".mp3", ".wav"):
-            p = Path(d).expanduser() / f"{name}{ext}"
-            if p.exists():
-                return p
-    return None
-
-
 _SAMPLES = {}
 
 
 def load(name):
     """(stereo signal normalised to peak 1, onset index) for a named effect."""
     if name not in _SAMPLES:
-        src = _find_sfx(name)
-        x = read_audio(src) if src else _synth_sfx(name)
+        x = _synth_sfx(name)
         x = x / (np.max(np.abs(x)) or 1)
         on = int(np.argmax(np.max(np.abs(x), axis=1) > 0.12))  # align the transient to the event time
         _SAMPLES[name] = (x, on)

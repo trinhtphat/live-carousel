@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENCORE — LOUD TOUR</title>
+<style>
+/*FONTS*/
+:root{
+  --cream:#f5ead6; --bone:#fff6e6; --crimson:#c4161c; --blood:#5a0610; --ink:#140708; --amber:#ffbe6a; --gold:#ffd27a;
+  --chrome-text: linear-gradient(178deg,#ffffff 0%,#f4eee8 24%,#a99c97 46%,#3a2a2a 51%,#d9ccc6 63%,#ffffff 80%,#b9aaa3 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#fff;overflow:hidden;font-family:JBM,ui-monospace,monospace}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+#viewport{position:relative;flex:1;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1c0507 0%,#000 70%);touch-action:none;cursor:grab}
+#viewport:active{cursor:grabbing}
+#stage{position:absolute;left:0;top:0;width:6480px;height:1350px;transform-origin:0 0}
+#gl{position:absolute;top:0;display:block}
+#grain{display:none}
+#seamlines{position:absolute;inset:0;pointer-events:none;display:none;z-index:6}
+body.seams #seamlines{display:block}
+#seamlines i{position:absolute;top:0;bottom:0;width:0;border-left:3px dashed rgba(255,190,106,.8)}
+
+/* ---------- slide DOM: shared system ---------- */
+.slide{position:absolute;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none;transform-origin:540px 675px}
+.slide .brand{position:absolute;left:52px;top:196px;font-family:Fraktur;font-weight:700;font-size:58px;line-height:1;color:var(--cream);text-shadow:3px 3px 0 var(--blood)}
+.slide .brand sup{font-family:JBM;font-size:14px;vertical-align:top;margin-left:2px;position:relative;top:6px}
+.slide .setno{position:absolute;left:55px;top:262px;font-family:Stencil;font-size:19px;letter-spacing:.2em;color:rgba(245,234,214,.86);white-space:nowrap}
+.slide .setno b{color:var(--amber);font-weight:400}
+.big{font-family:Archivo;font-weight:900;font-stretch:62%;line-height:.84;letter-spacing:-.005em;color:var(--cream);text-transform:uppercase;white-space:nowrap}
+.shadow-hard{text-shadow:7px 7px 0 var(--blood)}
+.chrome{background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* gaffer tape with marker writing */
+.tape{position:absolute;display:inline-flex;align-items:center;gap:14px;padding:10px 26px 11px;background:
+  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),
+  linear-gradient(180deg,#2b2a29,#1d1c1b 55%,#232221);
+  color:var(--bone);font-family:Marker;font-size:30px;line-height:1;white-space:nowrap;
+  clip-path:polygon(0 6%,2% 0,4% 9%,6% 1%,8% 7%,92% 3%,94% 10%,96% 2%,98% 8%,100% 4%,99% 50%,100% 96%,98% 90%,96% 100%,94% 92%,92% 98%,8% 94%,6% 100%,4% 91%,2% 99%,0 93%,1% 50%);
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.45));transform-origin:0 50%}
+.tape.light{background:repeating-linear-gradient(90deg,rgba(0,0,0,.03) 0 2px,transparent 2px 5px),linear-gradient(180deg,#f3ede2,#e3dccf);color:#1a0d0d}
+.tape.red{background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 2px,transparent 2px 5px),linear-gradient(180deg,#d61f26,#b5121a);color:#fff3e4}
+.tape small{font-family:Stencil;font-size:17px;letter-spacing:.16em;opacity:.85}
+.tape .ink{display:inline-block}
+.spec{position:absolute;font-family:Stencil;font-size:18px;letter-spacing:.18em;color:rgba(245,234,214,.88);white-space:nowrap}
+svg.marker{position:absolute;inset:0;width:1080px;height:1350px;overflow:visible}
+svg.marker path{fill:none;stroke:var(--bone);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+svg.marker path.red{stroke:#ff3a3a}
+
+/* VU meter */
+.vu{position:absolute;left:46px;bottom:62px;width:206px;height:128px;border-radius:10px;background:linear-gradient(180deg,#2a2422,#151110);padding:8px;box-shadow:0 6px 18px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12)}
+.vu .face{position:relative;width:100%;height:100%;border-radius:5px;overflow:hidden;background:radial-gradient(ellipse at 50% 120%,#fff3cf 0%,#f1dfae 55%,#d9c08a 100%)}
+.vu svg{position:absolute;inset:0;width:100%;height:100%}
+.vu .lbl{position:absolute;left:0;right:0;bottom:7px;text-align:center;font-family:Stencil;font-size:13px;letter-spacing:.24em;color:#2a1a10}
+.vu .lbl b{color:#c4161c;font-weight:400;font-size:15px}
+.vu .glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(255,170,60,.0),rgba(255,140,40,0) 70%);mix-blend-mode:screen}
+
+/* slide 1 — the frontman */
+.s1 .brand{display:none}
+.s1 .setno{top:474px}
+.s1-hook{position:absolute;left:50px;top:520px;font-size:136px}
+.s1-hook span{display:block;transform-origin:0 80%}
+.s1-hook span.r{color:#ff3a33;text-shadow:7px 7px 0 #2a0306}
+.s1-sound{position:absolute;left:56px;top:1000px;line-height:1.35;display:flex;align-items:center;gap:14px;font-family:Stencil;font-size:21px;letter-spacing:.17em;color:var(--bone);white-space:nowrap}
+.s1-sound svg{width:34px;height:30px}
+.s1-sound b{font-weight:400;color:var(--amber)}
+.s1-swipe{position:absolute;right:58px;bottom:150px;font-family:Marker;font-size:34px;color:var(--bone);transform:rotate(-4deg)}
+
+/* slide 2 — drums */
+.s2-stomp{position:absolute;left:0;right:0;top:742px;text-align:center;font-size:300px;transform-origin:50% 100%}
+.s2-stomp span{display:inline-block;transform-origin:50% 100%}
+
+/* slide 3 — bass */
+.s3-low{position:absolute;left:0;right:0;top:300px;text-align:center;font-size:170px}
+.s3-low span{display:inline-block}
+
+/* slide 4 — guitar */
+.s4-flap{position:absolute;right:42px;top:196px;width:300px;font-family:Doto;font-weight:800;font-size:21px;line-height:1.24;color:var(--gold);text-align:right;letter-spacing:.06em}
+.s4-flap .hd{font-family:Stencil;font-size:16px;letter-spacing:.24em;color:rgba(245,234,214,.8);margin-bottom:8px;font-weight:400}
+.s4-flap .row{display:flex;justify-content:flex-end;gap:2px}
+.s4-flap .c{display:inline-block;width:.66em;text-align:center;background:linear-gradient(180deg,#1c1312 49%,#000 49% 51%,#241817 51%);border-radius:2px;margin-left:2px;padding:1px 0}
+
+/* slide 4: SOLO. */
+.s4-solo{position:absolute;right:44px;top:900px;font-size:250px;color:var(--cream)}
+.s4-solo span{display:inline-block}
+/* slide 5 — full band */
+.s5-vol{position:absolute;left:0;right:0;top:526px;text-align:center;font-family:Stencil;font-size:24px;letter-spacing:.42em;color:var(--bone);white-space:nowrap}
+.s5-vol b{color:#ffd27a;font-weight:400}
+
+/* slide 6 — encore */
+.s6-drop{position:absolute;left:0;right:0;top:648px;text-align:center}
+.s6-drop .k{font-family:Stencil;font-size:24px;letter-spacing:.4em;color:var(--bone);text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.s6-drop .d{font-size:150px;margin-top:6px}
+.s6-cta{position:absolute;left:50%;top:872px;transform:translateX(-50%) rotate(-2deg);font-size:32px}
+.pass{position:absolute;left:796px;top:46px;width:300px;transform-origin:150px 0}
+.pass .lan{position:absolute;left:142px;top:0;width:16px;height:300px;background:repeating-linear-gradient(180deg,#d61f26 0 18px,#a80f16 18px 20px);box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.pass .clip{position:absolute;left:132px;top:292px;width:36px;height:30px;border-radius:6px;background:linear-gradient(90deg,#8d8d8d,#f5f5f5 40%,#9a9a9a 60%,#e7e7e7)}
+.pass .card{position:absolute;left:12px;top:316px;width:276px;height:380px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#f7efe0,#efe3cc);box-shadow:0 18px 40px rgba(0,0,0,.55);color:#1a0b0b}
+.pass .card .top{height:118px;background:#c4161c;color:#fff4e2;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.pass .card .top .aaa{font-family:Archivo;font-weight:900;font-stretch:62%;font-size:84px;line-height:.9;letter-spacing:.02em}
+.pass .card .top .acc{font-family:Stencil;font-size:15px;letter-spacing:.32em}
+.pass .card .mid{padding:14px 18px 0;text-align:center}
+.pass .card .mid .logo{font-family:Fraktur;font-weight:700;font-size:56px;line-height:1}
+.pass .card .mid .tour{font-family:Stencil;font-size:14px;letter-spacing:.28em;margin-top:4px}
+.pass .card .mid .info{font-family:Doto;font-weight:800;font-size:19px;letter-spacing:.08em;margin-top:14px;line-height:1.3}
+.pass .card .bar{position:absolute;left:18px;right:18px;bottom:16px;height:40px;background:repeating-linear-gradient(90deg,#1a0b0b 0 3px,transparent 3px 5px,#1a0b0b 5px 6px,transparent 6px 9px,#1a0b0b 9px 13px,transparent 13px 15px)}
+.pass .card .holo{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 45%,rgba(255,200,160,.35) 50%,transparent 62%);mix-blend-mode:overlay;background-size:300% 100%}
+.pass .card .hole{position:absolute;left:123px;top:10px;width:30px;height:9px;border-radius:5px;background:#1a0b0b;opacity:.75}
+
+.flash{position:absolute;inset:0;opacity:0;pointer-events:none}
+
+/* ---------- UI chrome (not part of the slides) ---------- */
+#ui{height:58px;flex:none;display:flex;align-items:center;gap:14px;padding:0 18px;background:#0e0405;border-top:1px solid #2b0d10;font-size:12px;letter-spacing:.12em;color:#e2c3bd;user-select:none}
+#ui .logo{font-family:Fraktur;font-size:24px;letter-spacing:0;color:#fff;margin-right:6px;white-space:nowrap}
+#ui button{font:inherit;letter-spacing:.12em;background:#1d0a0c;border:1px solid #3a1418;color:#f1d9d3;padding:7px 10px;border-radius:6px;cursor:pointer}
+#ui button.on{background:#c4161c;border-color:#c4161c;color:#fff}
+#ui .grp{display:flex;gap:6px}
+#scrub{flex:1;accent-color:#c4161c;min-width:120px}
+#tread{width:56px;text-align:right;color:#fff}
+#ui .hint{color:#8d5f5a;white-space:nowrap}
+body.clean #ui{display:none}
+body.clean #viewport{background:#000;cursor:default}
+#loading{position:fixed;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:#000;z-index:20;font-size:13px;letter-spacing:.3em;color:#d99a90}
+#loading b{color:#fff;font-weight:600}
+body.ready #loading{display:none}
+@media (max-width:900px){#ui .hint,#ui .logo{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="viewport">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+
+      <section class="slide s1" style="left:0px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 01/06</b></div>
+        <div class="s1-hook big shadow-hard"><span>THE</span><span>CLOTHES</span><span>ARE THE</span><span class="r">BAND.</span></div>
+        <div class="s1-sound"><svg viewBox="0 0 34 30"><path d="M3 10h7l9-7v24l-9-7H3z" fill="#f5ead6"/><path d="M23 9c3 3 3 9 0 12M27 5c5 5 5 15 0 20" stroke="#ffbe6a" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg><span>SOUND ON —<br><b>EVERY SWIPE ADDS<br>A BAND MEMBER</b></span></div>
+        <div class="tape s1-tape" style="left:290px;top:1196px;transform:rotate(-3deg)"><span class="ink">LEAD VOCALS: THE LEATHER</span></div>
+        <div class="s1-swipe">swipe →</div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s2" style="left:1080px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 02/06</b></div>
+        <div class="s2-stomp big shadow-hard"></div>
+        <div class="tape s2-tape" style="left:300px;top:1222px;transform:rotate(2deg)"><span class="ink">ON DRUMS: THE BOOTS</span></div>
+        <div class="spec s2-spec" style="right:56px;top:262px;text-align:right">SIDE-ZIP CHELSEA<br>STACKED CUBAN HEEL<br>SILVER HARNESS</div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s3" style="left:2160px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 03/06</b></div>
+        <div class="s3-low big shadow-hard"></div>
+        <div class="tape s3-tape" style="left:290px;top:1220px;transform:rotate(-2deg)"><span class="ink">ON BASS: THE DENIM</span><small>14 OZ · STRAIGHT · WASHED BLACK</small></div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s4" style="left:3240px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 04/06</b></div>
+        <div class="s4-flap"></div>
+        <div class="s4-solo big shadow-hard"></div>
+        <div class="tape s4-tape" style="left:296px;top:1220px;transform:rotate(-1.5deg)"><span class="ink">ON GUITAR: THE TEE</span></div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s5" style="left:4320px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 05/06</b></div>
+        <div class="s5-vol">ALL TOGETHER NOW — <b>VOL 11</b></div>
+        <div class="tape red s5-tape" style="left:300px;top:1222px;transform:rotate(2.5deg)"><span class="ink">THE FULL BAND. ONE FIT.</span></div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s6" style="left:5400px">
+        <div class="brand">Encore<sup>®</sup></div>
+        <div class="setno">LOUD TOUR '26 — <b>SET 06/06</b></div>
+        <div class="s6-drop"><div class="k">COLLECTION 01: LOUD — DROPS</div><div class="d big shadow-hard">FRIDAY 8PM</div></div>
+        <div class="tape light s6-cta"><span class="ink">COMMENT "ENCORE" FOR EARLY ACCESS</span></div>
+        <div class="pass"><div class="lan"></div><div class="clip"></div><div class="card"><div class="hole"></div>
+          <div class="top"><div class="aaa">AAA</div><div class="acc">ALL ACCESS</div></div>
+          <div class="mid"><div class="logo">Encore</div><div class="tour">LOUD TOUR '26</div><div class="info">DROP 01<br>FRI — 8:00 PM<br>LINK IN BIO</div></div>
+          <div class="bar"></div><div class="holo"></div></div></div>
+        <div class="vu"></div>
+        <div class="flash"></div>
+      </section>
+
+      <div id="grain"></div>
+      <div id="seamlines"><i style="left:1080px"></i><i style="left:2160px"></i><i style="left:3240px"></i><i style="left:4320px"></i><i style="left:5400px"></i></div>
+    </div>
+  </div>
+  <div id="ui">
+    <span class="logo">Encore</span>
+    <div class="grp">
+      <button data-view="strip" title="S">STRIP</button>
+      <button data-view="1">01</button><button data-view="2">02</button><button data-view="3">03</button>
+      <button data-view="4">04</button><button data-view="5">05</button><button data-view="6">06</button>
+    </div>
+    <button id="play" title="Space">❚❚</button>
+    <input id="scrub" type="range" min="0" max="7.999" step="0.001" value="0">
+    <span id="tread">0.00s</span>
+    <button id="seamsBtn" title="G">SEAMS</button>
+    <button id="oneBtn" title="O">1:1</button>
+    <button id="sndBtn" title="M">SOUND</button>
+    <button id="clean" title="R">REC MODE</button>
+    <span class="hint">← → swipe · M sound · R rec · F full</span>
+  </div>
+</div>
+<div id="loading"><span>LOADING</span><b>…</b></div>
+<script>/*APP*/</script>
+</body>
+</html>

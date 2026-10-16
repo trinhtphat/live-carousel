@@ -1,21 +1,12 @@
-# Adapter: Gemini / Google AI Studio
+# Adapter: Gemini / AI Studio
 
-## Nạp skill
+Supply SKILL.md and the relevant references as named context files or system instructions as supported by the environment. A tool-enabled Gemini agent can execute scripts; an AI Studio chat without tools must produce an unrendered handoff.
 
-1. Mở Run settings trong Google AI Studio và dán phần thân `SKILL.md` vào **System Instructions**.
-2. Với motion mode, đưa `references/house-style.md`, `slide-recipes.md`, `engine-api.md`, `sound-design.md` vào context khi cần. Với photo mode, ưu tiên `photo-mode.md` và `render-qa.md`; thêm ảnh slide theo thứ tự.
-   Nếu dùng Premium Motion Video, đưa thêm `premium-motion-video/SKILL.md` và reference liên quan vào context; giữ tỷ lệ đã duyệt, từng slide và vòng lặp của Live Carousel làm ràng buộc đầu ra. Template đi kèm hiện chỉ được xác minh ở 4:5.
-   Nếu không có ảnh và muốn tham khảo thư viện phong cách, nạp thêm `gpt-image-2-style-library/SKILL.md` và phần style reference liên quan; cần công cụ tạo ảnh riêng để xuất file.
-3. Với context dài, giữ tài liệu nguồn thành các phần có tên file rõ ràng. Đặt brief, yêu cầu cụ thể và tiêu chí đầu ra ở cuối phần context. Yêu cầu model nêu file nào nó đã sử dụng.
+Use the same English core and four modes. Reply in the user's language; confirm on-video language in the brief. Read references/model-selection.md for model advice. Keep assets, manifests, fonts, licenses, scripts and engine paths relative to the skill/project. Never assume a private Premium toolkit, paid connector or local absolute path exists on another machine.
 
-## Prompt mẫu
+Follow topic selection and brief approval gates, preserving prior user choices. Read references/audio-integration.md before editing audio: mandatory manifest, BGM/SFX stems, visual triggers, subtle default, explicit custom style and peak normalization.
 
-```text
-Áp dụng Live Carousel Core Logic. Idea của tôi là [idea].
-Hãy đề xuất 5–10 chủ đề carousel khác nhau và đợi tôi chọn.
-Sau đó hỏi tỷ lệ video, tone màu và ngôn ngữ, rồi đưa brief để duyệt.
-Chỉ sản xuất sau khi brief được duyệt; nếu thiếu runtime render,
-ghi rõ đầu ra là bản thiết kế chưa xuất MP4.
-```
+On Windows, use a Python interpreter with numpy/opencv and Node/ffmpeg/ffprobe available in the same environment. POSIX setup wrappers require Git Bash/WSL; portable Python scaffolds can be invoked directly. Install only dependencies for the chosen engine. Runtime checks on one platform do not prove execution on another.
 
-Google AI Studio dạng chat không tự biến Instructions thành quyền truy cập filesystem hoặc các công cụ render. Với Gemini API hoặc một agent có shell, gắn cùng thư mục skill và thực hiện workflow trong `SKILL.md` ở runtime đó.
+Prompt example:
+"Use live-carousel for [idea]. Preserve my approved brand and language. Propose topics if necessary, then present a production brief for approval. Use Subtle/Smooth audio unless I request another profile. Render only when your tools support it and report the actual artifacts and checks."

@@ -1,0 +1,11 @@
+{
+  "mode": "score",
+  "instrumental": true,
+  "caption": "Bright feel-good pop instrumental for a short social video, 120 BPM, major key, warm and friendly. Soft felt piano chords, warm round bass, marimba melody, gentle live drums with a soft kick and brushed snare, airy pad. A simple four-chord progression that repeats every four bars the whole way through. Steady groove from the first bar to the end, no intro, no breakdown. No hi-hats, no cymbals, no ticking, no glitches. Smooth polished production, soft rounded high end. Instrumental, no vocals.",
+  "lyrics": "[Verse - steady groove from the first beat, soft piano chords, marimba melody]\n\n[Chorus - a little brighter, warm pad]\n\n[Verse - steady groove, new melody]\n\n[Chorus - brighter]",
+  "bpm": 120,
+  "timesignature": 4,
+  "duration": 60,
+  "seeds": [11, 23],
+  "lm": "acestep-5Hz-lm-0.6B"
+}

@@ -1,6 +1,10 @@
+# Current audio contract
+
+Use audio-integration.md for audio. Photo hit/shine cues map to gentle synthetic events by default. Legacy boom/crash recipes below describe possible custom effects only; they never override the approved profile, manifest or two-track mixer.
+
 # Photo mode: bring finished slides to life
 
-The promise is that **frame 0 looks identical to the user's original image**. Only a fine film grain is added. Every effect sits on
+The promise is that **frame 0 preserves the supplied design**. The current renderer uses a 4:5 center crop, resize and JPEG base; it is not byte-identical to the source. Inspect that normalized base against the source and approve any crop before rendering. Only a fine film grain may be added. Every effect sits on
 top of the image, or re-paints pixels that match it, and everything returns to rest before the loop
 point. Nothing is regenerated and the design never breaks.
 
@@ -15,6 +19,7 @@ point. Nothing is regenerated and the design never breaks.
 | `head.png` | the headline letters only, in their own tone | `PH.extrusion` + the flat re-paint on top |
 | `accent.png` | saturated shapes over the headline (brush words, stickers) | re-painted above headline effects |
 | `subject.png` | (`--cutout`) the person or product, defringed | parallax pop |
+| `over.png` | optional static matte of text over a cutout, restoring original pixels above the moving subject | original-pixel repaint |
 | `geo.json` | boxes in canvas px: `text`, `headline`, `subject`, plus `palette.accent/accent2`, `headline_color` | the slide script, as `GEO` |
 
 ### Fixing the masks (always look at `prep/NN_maskvis.jpg`)
@@ -24,9 +29,19 @@ point. Nothing is regenerated and the design never breaks.
 - **Text, faces or logos drifting (not red enough):** lower `--busy` (0.04).
 - **Headline missing or partly missing:** lower `--edge` (50) for soft or low-contrast type. If junk
   is picked up as text, raise it (90).
-- **Headline box wrong:** edit `"headline": [x0, y0, x1, y1]` in `assets/NN/geo.json` by hand. The
-  slide reads the box from there. (head.png still comes from detection: re-run with other flags if
-  the letters themselves are wrong.)
+- **Headline box wrong:** rerun `prep_photo.py --only 03 --headline 03=140,180,940,520:light`.
+  Coordinates are integer canvas pixels `[x0,y0,x1,y1]` inside 1080x1350 with positive area.
+  Use `:dark` for near-black text; the default is `:light`. The override selects the region of
+  the detected glyph matte; it does not invent glyphs when detection fails. Tune `--edge` too.
+  For persistent overrides, write `headline_override.json` in the project root:
+  `{"03":{"box":[140,180,940,520],"tone":"light"}}`. CLI values override that file.
+- **Wrong person or extra objects in the cutout:** use `--cutout --subject-box 03=290,400,480,1180`.
+  The crop limits the existing alpha mask; it does not perform semantic object selection.
+  Very large, tiny or text-heavy cutouts are conservatively skipped; inspect the debug view.
+- **Text printed over a subject:** the prep step removes those letters from the moving cutout
+  and saves `over.png` to repaint their original pixels above it. Inspect both mid-motion and
+  rest frames for halos. Repaint and cutout layers fade to zero at both loop endpoints so
+  approximate masks cannot alter the base at rest. If ghosting persists, disable the cutout.
 - Re-run only one slide: `prep_photo.py --only 03`.
 
 ## Cues (`carousel.json → cues.NN`), shared by the slide and the audio
@@ -93,3 +108,11 @@ point. Nothing is regenerated and the design never breaks.
   type, and `accent.png` with the original pixels for coloured strokes.
 - When text sits on a busy photo, prefer `shine` and camera over `extrude`.
 - Leave fine print (credits, captions) untouched. It is held still on purpose.
+
+## Compatibility and validation
+
+The existing `GEO`, `CUES`, `PH` and `LC` interfaces remain compatible with the live engine and
+Premium Motion integration. New geometry field `over_subject` is optional and false when absent.
+No font or palette preset may re-typeset a supplied photo-mode slide unless the user requests it.
+Check frame 0, 25%, 50%, 75% and the loop endpoint against the normalized base; also inspect
+`prep/NN_maskvis.jpg`. Static overlays inherit stage camera movement but do not scale with the subject.

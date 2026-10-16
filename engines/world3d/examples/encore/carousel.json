@@ -1,0 +1,15 @@
+{
+ "title": "ENCORE\u00ae \u2014 LOUD TOUR '26 (rock clothing drop)",
+ "html": "dist/encore-loud.html",
+ "slides": [
+  "01-frontman",
+  "02-drums",
+  "03-bass",
+  "04-guitar",
+  "05-full-band",
+  "06-encore"
+ ],
+ "loop": 8,
+ "fps": 30,
+ "bpm": 120
+}
