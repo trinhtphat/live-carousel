@@ -2,6 +2,7 @@
 """Split finished carousel slides into animatable layers. No generative edits: the user's pixels stay.
 
   py prep_photo.py [--only 01 03] [--cutout] [--edge 70] [--busy 0.06]
+                   [--headline 01=188,161,923,383:light] [--subject-box 01=290,400,480,1180]
 
 For every source/<NN>.(png|jpg|webp) writes assets/<NN>/:
   bg.jpg       the original at 2160x2700 (2x the canvas, so camera pushes stay crisp). Frame 0 shows exactly this.
@@ -11,15 +12,20 @@ For every source/<NN>.(png|jpg|webp) writes assets/<NN>/:
   head.png     matte of the headline only (the line(s) with the tallest letters), in its own tone
   accent.png   saturated shapes over the headline (brush words): re-painted on top of headline effects
   subject.png  (--cutout) the main subject cut out with HyperFrames' free local background remover
+  over.png     (--cutout) type printed OVER the subject: drawn back on a static layer above the cut-out,
+               and painted out of subject.png, so the letters stay crisp and never ghost when the subject pops
   geo.json     boxes in 1080x1350 canvas px: text lines, headline, subject, plus the image's palette
-and prep/<NN>_maskvis.jpg: red = held still, green = text lines, blue = headline. LOOK AT IT: if the
-headline box is wrong or sky is frozen, tune the flags (or hand-edit geo.json boxes) and re-run.
+and prep/<NN>_maskvis.jpg: red = held still, green = text lines, blue = headline, magenta = type over the
+subject. LOOK AT IT: if the headline box is wrong, pass --headline NN=x0,y0,x1,y1[:light|dark] (canvas px,
+1080x1350) or put the same in headline_override.json; if the cut-out grabbed more than the person (a crowd),
+pass --subject-box NN=x0,y0,x1,y1. A cut-out covering most of the frame (a graphic slide, no person) is dropped.
 Non-4:5 images are centre-cropped to 4:5.
 """
 import argparse
 import json
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 
 import cv2
@@ -181,7 +187,46 @@ def main():
     ap.add_argument("--cutout", action="store_true", help="cut out the main subject (local model, downloads once)")
     ap.add_argument("--edge", type=float, default=70, help="edge sharpness that counts as text: lower finds softer text, higher ignores texture")
     ap.add_argument("--busy", type=float, default=0.06, help="edge density above which an area is held still")
+    ap.add_argument("--headline", action="append", default=[], metavar="NN=x0,y0,x1,y1[:light|dark]",
+                    help="force a slide's headline box (canvas px) when detection picks the wrong line")
+    ap.add_argument("--subject-box", action="append", default=[], metavar="NN=x0,y0,x1,y1",
+                    help="keep only this part of the cut-out (one person out of a crowd)")
     a = ap.parse_args()
+    if a.subject_box and not a.cutout:
+        ap.error("--subject-box requires --cutout")
+
+    def boxes_arg(items, with_tone=False):
+        out = {}
+        for it in items:
+            k, v = it.split("=", 1)
+            tone = None
+            if ":" in v:
+                v, tone = v.split(":", 1)
+            b = [int(n) for n in v.split(",")]
+            out[k.strip()] = {"box": b, "tone": tone or "light"} if with_tone else b
+        return out
+
+    def validate_box(box):
+        if (not isinstance(box, list) or len(box) != 4
+                or any(type(v) is not int for v in box)
+                or not (0 <= box[0] < box[2] <= CW and 0 <= box[1] < box[3] <= CH)):
+            raise ValueError("boxes must be integer x0,y0,x1,y1 within 1080x1350, with positive area")
+
+    head_ovr = {}
+    ovr_file = ROOT / "headline_override.json"
+    if ovr_file.exists():
+        head_ovr.update(json.loads(ovr_file.read_text()))
+    try:
+        head_ovr.update(boxes_arg(a.headline, with_tone=True))
+        subj_box = boxes_arg(a.subject_box)
+        for item in head_ovr.values():
+            validate_box(item["box"])
+            if item.get("tone", "light") not in ("light", "dark"):
+                raise ValueError("headline tone must be light or dark")
+        for box in subj_box.values():
+            validate_box(box)
+    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        ap.error(str(exc))
 
     PREP.mkdir(exist_ok=True)
     files = sorted(p for p in SRC.iterdir() if p.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"))
@@ -227,6 +272,9 @@ def main():
                 y1 = max(h["box"][3] for h in head)
                 if l["box"][1] <= y1 + 0.6 * top["glyph_h"] and l["box"][3] >= y0 - 0.6 * top["glyph_h"]:
                     head.append(l)
+        if s in head_ovr:
+            ob = head_ovr[s]["box"]
+            head = [{"box": ob, "tone": head_ovr[s].get("tone", "light"), "glyph_h": ob[3] - ob[1]}]
         if head:
             hb = [min(l["box"][0] for l in head), min(l["box"][1] for l in head), max(l["box"][2] for l in head), max(l["box"][3] for l in head)]
             geo["headline"] = hb
@@ -259,19 +307,56 @@ def main():
             cut = PREP / f"{s}_cut.png"
             src_png = PREP / f"{s}_src.png"
             cv2.imwrite(str(src_png), im)
-            r = subprocess.run(["npx", "--yes", "hyperframes@0.8.121", "remove-background", str(src_png), "-o", str(cut)], capture_output=True, text=True)
+            r = subprocess.run([shutil.which("npx") or "npx", "--yes", "hyperframes@0.8.121", "remove-background", str(src_png), "-o", str(cut)], capture_output=True, text=True)
             if r.returncode == 0 and cut.exists():
                 p = cv2.imread(str(cut), cv2.IMREAD_UNCHANGED)
                 p = cv2.resize(p, (W, H), interpolation=cv2.INTER_AREA)
                 al = p[..., 3].astype(np.float32) / 255
+                if s in subj_box:  # keep one person out of a crowd
+                    x0, y0, x1, y1 = (v * K for v in subj_box[s])
+                    keep = np.zeros_like(al)
+                    keep[max(0, y0) : y1, max(0, x0) : x1] = 1
+                    al *= cv2.GaussianBlur(keep, (0, 0), 6)
                 al = cv2.GaussianBlur(cv2.erode(al, np.ones((3, 3), np.uint8)), (0, 0), 1.2)  # defringe
                 solid = (p[..., 3] > 250).astype(np.uint8)
                 fill = cv2.inpaint(p[..., :3], (1 - solid) * 255, 5, cv2.INPAINT_TELEA)
-                cv2.imwrite(str(out / "subject.png"), rgba(fill, al))
                 subj_a = cv2.resize(al, (CW, CH), interpolation=cv2.INTER_AREA)
-                ys, xs = np.nonzero(subj_a > 0.5)
-                if len(xs):
+                cover = float((subj_a > 0.5).mean())
+                # type printed over the subject (measured before deciding whether this is a person at all)
+                over = (text_a * cv2.dilate((subj_a > 0.3).astype(np.uint8), np.ones((9, 9), np.uint8)) > 0.35).astype(np.uint8)
+                n, lab, st, _ = cv2.connectedComponentsWithStats(over, 8)
+                keep = np.zeros(n, bool)
+                for i in range(1, n):
+                    keep[i] = 6 <= st[i, 3] <= 220 and st[i, 4] >= 8
+                over = keep[lab].astype(np.uint8)
+                type_share = float(over.sum()) / max(1.0, float((subj_a > 0.5).sum()))
+                if cover > 0.45 or cover < 0.004 or over.sum() > 60000 or type_share > 0.2:
+                    # a "subject" that is mostly the layout (cards, type) or most of the frame is a graphic
+                    # slide, not a person: no pop (painting that much type out of it would smear frame 0)
+                    print(f"    cut-out is layout, not a person ({cover * 100:.0f}% of the frame, {type_share * 100:.0f}% type): ignoring it")
+                    subj_a = None
+                else:
+                    # type printed OVER the subject must not ride along with it (or be eaten by the defringe):
+                    # keep its original pixels on a static layer above the cut-out, and paint it out of the cut-out
+                    geo["over_subject"] = bool(over.sum() > 120)
+                    if geo["over_subject"]:
+                        hole1 = cv2.dilate(over, np.ones((5, 5), np.uint8))  # letters + a margin, canvas px
+                        # the static layer is fully opaque over everything painted out (feathered only outside it)
+                        om = cv2.GaussianBlur(cv2.dilate(hole1, np.ones((5, 5), np.uint8)).astype(np.float32), (0, 0), 0.8)
+                        om = np.maximum(om, hole1.astype(np.float32))
+                        cv2.imwrite(str(out / "over.png"), rgba(white, om))
+                        hole = cv2.resize(hole1, (W, H), interpolation=cv2.INTER_NEAREST)
+                        ys, xs = np.nonzero(hole)
+                        region = np.zeros_like(hole)
+                        region[max(0, ys.min() - 40) : ys.max() + 40, max(0, xs.min() - 40) : xs.max() + 40] = 1
+                        # fill from the subject's own opaque pixels only (transparent ones would bleed white in)
+                        fmask = ((hole > 0) | ((al < 0.5) & (region > 0))).astype(np.uint8) * 255
+                        fill = cv2.inpaint(np.ascontiguousarray(fill), fmask, 9, cv2.INPAINT_TELEA)
+                        print(f"    type over the subject: {int(over.sum())} px kept on a static layer above the cut-out")
+                    cv2.imwrite(str(out / "subject.png"), rgba(fill, al))
+                    ys, xs = np.nonzero(subj_a > 0.5)
                     geo["subject"] = [int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())]
+                    geo["over_subject"] = bool(geo.get("over_subject"))
             else:
                 print("    cut-out failed:", (r.stdout + r.stderr).strip()[-300:])
 
@@ -322,6 +407,9 @@ def main():
         if geo["headline"]:
             hb = geo["headline"]
             cv2.rectangle(vis, (hb[0] - 6, hb[1] - 6), (hb[2] + 6, hb[3] + 6), (255, 120, 40), 4)
+        if geo.get("over_subject"):
+            om = cv2.imread(str(out / "over.png"), cv2.IMREAD_UNCHANGED)[..., 3] > 128
+            vis[om] = (255, 0, 255)
         cv2.imwrite(str(PREP / f"{s}_maskvis.jpg"), cv2.resize(vis, (540, 675)), [cv2.IMWRITE_JPEG_QUALITY, 85])
         print(f"    {len(lines)} text lines, headline {geo['headline']}, {geo['moving_share'] * 100:.0f}% of the frame can move, accent {geo['palette']['accent']}")
 

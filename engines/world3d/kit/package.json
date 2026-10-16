@@ -1,0 +1,18 @@
+{
+  "name": "world3d-carousel",
+  "private": true,
+  "type": "module",
+  "description": "3D brand live carousel: one Three.js world across every slide, rendered frame-exact to MP4.",
+  "scripts": {
+    "build": "node build.mjs",
+    "render": "node tools/render.mjs",
+    "mux": "node tools/mux.mjs",
+    "sheet": "node tools/sheet.mjs"
+  },
+  "dependencies": {
+    "esbuild": "0.25.12",
+    "opentype.js": "1.3.4",
+    "playwright-core": "1.63.0",
+    "three": "0.186.1"
+  }
+}

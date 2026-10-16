@@ -1,16 +1,12 @@
-# Adapter: Claude Code / CLI
+# Adapter: Claude / Claude Code
 
-Giữ cách dùng cũ: chép nguyên `live-carousel/` vào `~/.claude/skills/live-carousel/` (Windows: `%USERPROFILE%\.claude\skills\live-carousel`). Bắt đầu phiên Claude Code mới để môi trường đọc skill, rồi yêu cầu:
+Load the entire skill folder using the skill mechanism supported by the installed Claude environment. Claude Code may run local scripts with its granted permissions. A chat-only Claude session should produce a handoff when no render tools exist.
 
-```text
-Use live-carousel for my idea: [idea]. First suggest 5–10 distinct
-carousel topics and wait for my choice. Then confirm aspect ratio,
-palette, and on-video language in a brief. Produce and render only
-after I approve that brief; inspect contact sheet, seams, and audio.
-```
+Use the same English core and four modes. Reply in the user's language; confirm on-video language in the brief. Read references/model-selection.md for model advice. Keep assets, manifests, fonts, licenses, scripts and engine paths relative to the skill/project. Never assume a private Premium toolkit, paid connector or local absolute path exists on another machine.
 
-`INSTALL-PROMPT.md` được giữ làm hướng dẫn cài tự động cho Claude Code. Nó là adapter lịch sử, không phải Core Logic. Đọc và rà lại các đường dẫn, lệnh cài và quyền hệ thống trước khi chạy. Cài toolchain qua `bash scripts/setup.sh`; trên Windows cần Bash-capable shell. Nếu CLI không có quyền shell/network, thực hiện phần thiết kế và báo cáo giới hạn như `SKILL.md` quy định.
+Follow topic selection and brief approval gates, preserving prior user choices. Read references/audio-integration.md before editing audio: mandatory manifest, BGM/SFX stems, visual triggers, subtle default, explicit custom style and peak normalization.
 
-Nếu `premium-motion-video` cũng được cài cho Claude Code, yêu cầu dùng cả hai skill. Đọc `renderers/premium-motion-video.md` và cấu hình `PREMIUM_MOTION_TOOLKIT` trước khi chọn `--renderer premium`.
+On Windows, use a Python interpreter with numpy/opencv and Node/ffmpeg/ffprobe available in the same environment. POSIX setup wrappers require Git Bash/WSL; portable Python scaffolds can be invoked directly. Install only dependencies for the chosen engine. Runtime checks on one platform do not prove execution on another.
 
-Nếu user không có ảnh và `gpt-image-2-style-library` có sẵn trong phiên, đọc nó sau khi brief được duyệt để đề xuất phong cách và prompt tạo ảnh. Việc tạo file ảnh cần một công cụ tạo ảnh riêng.
+Prompt example:
+"Use live-carousel for [idea]. Preserve my approved brand and language. Propose topics if necessary, then present a production brief for approval. Use Subtle/Smooth audio unless I request another profile. Render only when your tools support it and report the actual artifacts and checks."

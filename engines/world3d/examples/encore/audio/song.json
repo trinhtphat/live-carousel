@@ -1,0 +1,13 @@
+{
+  "mode": "score",
+  "instrumental": true,
+  "caption": "Swaggering rock and roll instrumental, 120 BPM, E minor, cool and confident like a fashion runway show in a rock club. A catchy fuzzy overdriven electric guitar riff on a warm vintage tube amp (round, thick and warm, not harsh), a driving melodic bass guitar locked to the riff, a stomping live drum groove with a big round kick, a fat snare and hand claps on 2 and 4, floor toms, very light closed hi-hat, no crash cymbals, no ride cymbal, a gritty vintage organ playing stabs. The riff repeats every four bars and stays the same the whole song, so the groove is steady from the very first bar to the end, no intro, no breakdown, no tempo change. Warm vintage tape saturation, punchy but smooth, soft rounded high end, never harsh, never fizzy. Instrumental, no vocals.",
+  "lyrics": "[Verse - full band from the first beat, fuzz guitar riff, bass doubles the riff, stomp and clap drums]\n\n[Verse - same riff, organ stabs join]\n\n[Chorus - bigger and lifted, lead guitar melody over the riff, floor toms, hand claps]\n\n[Verse - same riff, full band]\n\n[Chorus - biggest, lead guitar melody, organ, floor toms]\n\n[Outro - the riff continues, full band]",
+  "bpm": 120,
+  "timesignature": 4,
+  "duration": 56,
+  "target_duration": 52,
+  "seeds": [7, 31, 64, 113],
+  "fps": 30,
+  "lm": "acestep-5Hz-lm-0.6B"
+}

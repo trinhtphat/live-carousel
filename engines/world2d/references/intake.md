@@ -1,0 +1,71 @@
+# Intake — the interview
+
+Better carousels come from better inputs. Ask before you design. (The router SKILL.md has already picked this
+engine.) Send ONE message with the questions
+below (numbered, short, each with its default in brackets). Skip any question the user already
+answered. Tell them they can reply in one line per number, or just say "defaults".
+
+```
+Before I build, 8 quick questions (one line each is plenty — or say "defaults"):
+
+1. Your business — name, what you sell, who it's for. Website or Instagram handle if you have one (I'll look).
+2. Topic — do you have one (a launch, offer, tip, story, event)? Or should I find 3 angles for you to pick? [I find 3]
+3. Goal — what should people do after the last slide? (order / DM a keyword / link in bio / book / follow) Any price, offer or date?
+4. Budget — $0 (everything drawn in code, free) or AI assets (photoreal product shots or hero images via Higgsfield or another AI tool you've connected, costs credits — I'll show you the cost before spending)? [$0]
+5. Real images — product photos, logo, screenshots, photos of you or your place? Give me the folder. [none: I draw everything]
+6. Style — brand colours/fonts, a brand guide / style sheet, or posts / carousels / accounts you love (files or links)? [I pick a look for your business]
+7. Format — how many slides, which platform, how long each loop? [6 slides · Instagram 4:5 (1080×1350) · 8 s]
+8. Words — language and tone, plus anything you must say or must never say (claims, legal lines, words to avoid)? [your language · punchy]
+```
+
+If the client has the AskUserQuestion tool, you may ask 2 (topic), 4 (budget) and 7 (format) as
+multiple-choice there and the rest in plain text, but keep it to one round.
+
+## How each answer changes the build
+
+**1 · Business.** Decides the protagonist (the object that travels or evolves across the slides),
+the metaphors, the vocabulary of motion (a bakery rises and steams; a fintech app ticks and counts;
+a gym slams and pulses; a skincare brand drips and glows) and the world colours. If you got a URL or
+handle, read it for product names, prices, tone of voice and real claims. Never invent prices,
+awards, reviews or claims; put a `[CHECK]` placeholder and ask.
+
+**2 · Topic.** If they have one, sharpen it into one promise. If they want you to find it, propose 3
+angles, each with a hook line and why it works for their audience, then let them pick:
+- Launch / new item ("Something hot is coming") · Process / behind the scenes ("How we build it, layer by layer")
+- Offer with urgency ("This weekend only") · Myth vs truth · Before → after / transformation
+- Ranked list ("3 things every … needs") · Story of a customer · Seasonal / cultural moment.
+Prefer the angle that gives the protagonist the most to *do* across the slides.
+
+**3 · Goal.** Shapes the last slide (and the caption): a price stamp + "order now" button, a giant
+DM keyword, a "link in bio" arrow, a booking date. One CTA only. Repeat the offer once earlier.
+
+**4 · Budget.**
+- `$0` (default): the protagonist is drawn in code like the example burger (gradients, layered shapes,
+  material angles so it can turn). This is free forever and looks illustrated-premium.
+- `AI assets`: follow `references/assets.md` (Higgsfield recipe). Check the connector is available
+  (its tools appear in your tool list). If not, tell the user how to connect it — in Claude Desktop /
+  claude.ai: Settings → Connectors → add Higgsfield and sign in; in Claude Code: add the connector or MCP
+  server the tool documents — and wait. List every asset you plan to make with its credit cost; get a
+  yes before the first paid call. Never upscale or re-roll without asking.
+- If they name another tool (any AI image/video tool they have connected), use it the same way:
+  generate → cut out → drop PNGs into `assets/`.
+
+**5 · Real images.** Copy them into `assets/` (rename to short names: `logo.png`, `product.png`,
+`shot1.jpg`). Products and logos work best as PNGs with a transparent background; photos work as
+framed cards (rounded, shadowed, parallax, tilted into place). Ask before using photos of people other
+than the user. See `references/assets.md`.
+
+**6 · Style.** Take colours (hex), fonts and attitude from what they give you. Bundled display
+fonts: Anton (tall condensed), Anybody Wide/Black (chunky), JetBrains Mono (labels). If their brand
+font is a free web font file they give you, add it to `fonts/` and `build.py`. For reference posts,
+borrow the energy and layout logic, never the artwork. With no reference, derive a palette from the
+business (dark base + one hot accent + one warm neutral is a safe premium recipe).
+
+**7 · Format.** Instagram/LinkedIn 4:5 = 1080×1350 (default). TikTok photo mode / Stories 9:16 =
+1080×1920 (set `width`/`height` in `00-project.js` and lay out for the taller frame). 4–8 slides;
+loop 4, 6 or 8 s (whole bars at 120 BPM so music syncs later).
+
+**8 · Words.** Write all on-slide copy in their language and tone. Keep slides to ≤ 8 big words plus a
+small line. Put must-say lines on the CTA slide; respect must-never-say lists everywhere.
+
+After the answers: write `BRIEF.md`, fill its slide-plan table, show plan + copy, ask "Build it?" once.

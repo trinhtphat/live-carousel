@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PEARL LAB — SMILE</title>
+<style>
+/*FONTS*/
+:root{
+  --cyan:#1fc8ff; --ice:#a8ecff; --mint:#7dffcb; --ink:#06121c; --pearl:#f3f6f8;
+  --chrome-text: linear-gradient(178deg,#ffffff 0%,#eef6f9 26%,#9fb2bd 47%,#47586a 52%,#d3e2ea 66%,#ffffff 82%,#a7bcc8 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:#fff;overflow:hidden;font-family:JBM,ui-monospace,monospace}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+#viewport{position:relative;flex:1;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#08141c 0%,#000 70%);touch-action:none;cursor:grab}
+#viewport:active{cursor:grabbing}
+#stage{position:absolute;left:0;top:0;width:6480px;height:1350px;transform-origin:0 0}
+#gl{position:absolute;top:0;display:block}
+#grain{position:absolute;top:0;height:1350px;pointer-events:none;mix-blend-mode:overlay;opacity:.09;background-size:220px 220px;z-index:5}
+#seamlines{position:absolute;inset:0;pointer-events:none;display:none;z-index:6}
+body.seams #seamlines{display:block}
+#seamlines i{position:absolute;top:0;bottom:0;width:0;border-left:3px dashed rgba(125,255,203,.75)}
+
+/* ---------- slide DOM: shared system ---------- */
+.slide{position:absolute;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none}
+.slide .brand{position:absolute;left:64px;top:54px;font-family:Anybody;font-weight:900;font-variation-settings:'wdth' 150;font-size:27px;letter-spacing:.34em;color:#fff}
+.slide .brand i{font-style:normal;color:var(--cyan)}
+.slide .meta{position:absolute;left:66px;top:96px;font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.66)}
+.slide .meta b{color:var(--ice);font-weight:600}
+.flash,.invert{position:absolute;inset:0;opacity:0;pointer-events:none}
+.flash{background:#fff;mix-blend-mode:overlay}
+.whiteout{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),#fff 0%,rgba(220,250,255,.85) 30%,rgba(160,235,255,0) 75%);mix-blend-mode:screen}
+.mono{font-family:JBM}
+
+/* slide 1 */
+.s1-kicker{position:absolute;left:50%;top:118px;transform:translateX(-50%);font-family:Anybody;font-weight:800;font-variation-settings:'wdth' 140;font-size:30px;letter-spacing:.62em;padding-left:.62em;color:#d8f6ff;white-space:nowrap;text-shadow:0 0 22px rgba(31,200,255,.75)}
+.s1-sub{position:absolute;left:50%;top:536px;transform:translateX(-50%);font-family:Anybody;font-weight:800;font-variation-settings:'wdth' 140;font-size:46px;letter-spacing:.06em;white-space:nowrap;color:#eefbff}
+.s1-sub em{font-style:normal;color:var(--mint)}
+.s1-read{position:absolute;left:64px;bottom:70px;font-size:15px;letter-spacing:.24em;color:rgba(255,255,255,.72);display:flex;align-items:center;gap:12px}
+.s1-read i{width:10px;height:10px;border-radius:50%;display:inline-block;background:#ff4d6d;box-shadow:0 0 12px currentColor}
+.s1-tag{position:absolute;left:64px;bottom:104px;font-size:13px;letter-spacing:.3em;color:rgba(255,255,255,.4)}
+.s1-swipe{position:absolute;right:170px;bottom:150px;font-family:Anybody;font-weight:800;font-variation-settings:'wdth' 130;font-size:24px;letter-spacing:.3em;color:#fff}
+.s1-swipe span{display:inline-block;color:var(--mint)}
+
+/* slide 2 */
+svg.callouts,svg.xlabels,svg.fitlines,svg.glints{position:absolute;inset:0;width:1080px;height:1350px;overflow:visible}
+svg.callouts polyline,svg.xlabels polyline{fill:none;stroke:#fff;stroke-width:1.6;stroke-linejoin:round;opacity:.9}
+svg.callouts circle{fill:#fff}
+svg.callouts circle.ring{fill:none;stroke:var(--cyan);stroke-width:2}
+.co-label{position:absolute;width:280px;line-height:1}
+.co-label.r{text-align:right}
+.co-label b{display:block;font-family:Anton;font-weight:400;font-size:40px;letter-spacing:.02em;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.co-label span{display:block;margin-top:8px;font-size:12.5px;letter-spacing:.2em;color:rgba(255,255,255,.75);white-space:nowrap}
+.s2-head{position:absolute;left:58px;bottom:48px;font-family:Anton;font-size:178px;line-height:.86;letter-spacing:-.005em;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(0,0,0,.55))}
+.s2-tag{position:absolute;right:64px;bottom:70px;text-align:right;font-size:13px;letter-spacing:.26em;line-height:1.7;color:rgba(255,255,255,.6)}
+.s2-tag b{color:var(--mint);font-weight:600}
+
+/* slide 3 */
+.s3-head{position:absolute;left:58px;top:136px;font-family:Anton;font-size:150px;line-height:.9;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s3-head small{display:block;font-family:JBM;font-size:15px;letter-spacing:.42em;-webkit-text-fill-color:var(--ice);color:var(--ice);margin-bottom:14px}
+svg.xlabels circle{fill:var(--mint)}
+svg.xlabels polyline{stroke:rgba(255,255,255,.85)}
+.x-label{position:absolute;width:260px;line-height:1}
+.x-label b{display:block;font-family:Anton;font-size:44px;color:#fff;letter-spacing:.02em}
+.x-label span{display:block;margin-top:7px;font-size:12px;letter-spacing:.2em;color:var(--ice);white-space:nowrap}
+.s3-rot{position:absolute;left:64px;bottom:70px;font-size:15px;letter-spacing:.24em;color:rgba(255,255,255,.7)}
+.s3-rot b{color:#fff;font-weight:700;font-size:22px;letter-spacing:.08em;margin-left:8px}
+.s3-mode{position:absolute;left:64px;bottom:104px;font-size:13px;letter-spacing:.3em;color:rgba(255,255,255,.45)}
+.s3-mode.on{color:var(--mint)}
+
+/* slide 4 (light world) */
+.s4 .brand{color:var(--ink)} .s4 .brand i{color:#0a8fc4} .s4 .meta{color:rgba(6,18,28,.6)} .s4 .meta b{color:#0a8fc4}
+.s4-scan{position:absolute;top:330px;height:470px;width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 10px 3px rgba(31,200,255,.95),0 0 46px 14px rgba(31,200,255,.45);opacity:0}
+.s4-shade{position:absolute;left:64px;bottom:66px;font-size:15px;letter-spacing:.22em;color:var(--ink);display:flex;gap:12px;align-items:center}
+.s4-shade i{width:10px;height:10px;border-radius:50%;background:#0a8fc4;display:inline-block}
+.s4-shade b{font-family:Anton;font-weight:400;font-size:30px;letter-spacing:.04em}
+.s4-claim{position:absolute;right:64px;bottom:66px;text-align:right;font-size:13px;letter-spacing:.24em;line-height:1.7;color:rgba(6,18,28,.7)}
+.s4-claim b{color:var(--ink);font-weight:700}
+.tab-code{position:absolute;width:80px;margin-left:-40px;text-align:center;font-size:12px;letter-spacing:.14em;color:rgba(6,18,28,.7)}
+.tab-ptr{position:absolute;top:1150px;width:0;height:0;margin-left:-9px;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:13px solid #0a8fc4}
+svg.glints path{fill:#fff;filter:drop-shadow(0 0 6px rgba(31,200,255,1)) drop-shadow(0 0 18px rgba(31,200,255,.7))}
+.s4-scan b{position:absolute;top:-30px;font-size:12px;letter-spacing:.26em;font-weight:700;white-space:nowrap}
+.s4-scan b.l{right:14px;color:#0a8fc4} .s4-scan b.r{left:14px;color:#9a7a45}
+
+/* slide 5 */
+.s5-g{position:absolute;left:66px;top:128px;font-size:14px;letter-spacing:.22em;color:rgba(255,255,255,.8)}
+.s5-g b{color:#fff;font-weight:700} .s5-g b.alt{color:var(--mint)}
+.s5-look{position:absolute;left:58px;bottom:62px}
+.s5-look b{display:block;font-family:Anton;font-weight:400;font-size:78px;line-height:.9;color:#fff;text-shadow:0 4px 30px rgba(0,40,80,.55)}
+.s5-look span{display:block;margin-top:12px;font-size:13px;letter-spacing:.22em;color:#fff;text-shadow:0 1px 3px rgba(0,20,40,.9),0 0 14px rgba(0,20,40,.7)}
+
+/* slide 6 */
+.s6-kicker{position:absolute;left:50%;top:668px;transform:translateX(-50%);font-size:17px;letter-spacing:.42em;color:var(--ice);white-space:nowrap}
+.s6-first{position:absolute;left:0;right:0;top:704px;text-align:center;font-family:Anton;font-size:196px;line-height:1;letter-spacing:.01em;background:var(--chrome-text);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s6-free{position:absolute;left:0;right:0;top:880px;text-align:center;font-family:Anton;font-size:318px;line-height:1;color:var(--mint);transform-origin:50% 55%;text-shadow:0 0 60px rgba(125,255,203,.25)}
+.s6-free.rgb{text-shadow:-14px 0 0 rgba(255,60,140,.85),14px 0 0 rgba(31,200,255,.9)}
+.s6-cta{position:absolute;left:64px;bottom:62px;font-size:15px;letter-spacing:.24em;color:#fff;display:flex;gap:12px;align-items:center}
+.s6-cta i{width:10px;height:10px;border-radius:50%;background:var(--mint);display:inline-block;box-shadow:0 0 14px var(--mint)}
+
+/* ---------- UI chrome (not part of the slides) ---------- */
+#ui{height:58px;flex:none;display:flex;align-items:center;gap:14px;padding:0 18px;background:#060a0d;border-top:1px solid #15232b;font-size:12px;letter-spacing:.12em;color:#b6cdd6;user-select:none}
+#ui .logo{font-family:Anybody;font-weight:900;font-variation-settings:'wdth' 150;letter-spacing:.3em;color:#fff;margin-right:6px;white-space:nowrap}
+#ui button{font:inherit;letter-spacing:.12em;background:#0f1a20;border:1px solid #22363f;color:#d0eaf2;padding:7px 10px;border-radius:6px;cursor:pointer}
+#ui button.on{background:#0a8fc4;border-color:#0a8fc4;color:#fff}
+#ui .grp{display:flex;gap:6px}
+#scrub{flex:1;accent-color:#1fc8ff;min-width:120px}
+#tread{width:56px;text-align:right;color:#fff}
+#ui .hint{color:#5f7a86;white-space:nowrap}
+body.clean #ui{display:none}
+body.clean #viewport{background:#000;cursor:default}
+#loading{position:fixed;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;background:#000;z-index:20;font-size:13px;letter-spacing:.3em;color:#7fc6dd}
+#loading b{color:#fff;font-weight:600}
+body.ready #loading{display:none}
+@media (max-width:900px){#ui .hint,#ui .logo{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="viewport">
+    <div id="stage">
+      <canvas id="gl"></canvas>
+
+      <section class="slide s1" style="left:0px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">01 / 06 — <b>3D DENTAL STUDIO</b></div>
+        <div class="s1-kicker">YOUR NEXT</div>
+        <div class="s1-sub">IS <em>3D-DESIGNED.</em></div>
+        <div class="s1-tag">PEARL LAB — SMILE STUDIO</div>
+        <div class="s1-read"><i></i><b>SCANNER: STANDBY</b></div>
+        <div class="s1-swipe">SWIPE <span>→</span></div>
+      </section>
+
+      <section class="slide s2" style="left:1080px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">02 / 06 — <b>INVISIBLE ORTHODONTICS</b></div>
+        <svg class="callouts" viewBox="0 0 1080 1350"></svg>
+        <div class="s2-head">CLEAR<br>ALIGNERS</div>
+        <div class="s2-tag">YOUR RESULT<br>PREVIEWED IN 3D<br><b>BEFORE DAY ONE</b></div>
+      </section>
+
+      <section class="slide s3" style="left:2160px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">03 / 06 — <b>360° / EXPLODED</b></div>
+        <div class="s3-head"><small>PERMANENT. NOT PARTIAL.</small>THE IMPLANT</div>
+        <svg class="xlabels" viewBox="0 0 1080 1350"></svg>
+        <div class="s3-mode">ASSEMBLED</div>
+        <div class="s3-rot">ROT<b>000°</b></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s4" style="left:3240px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">04 / 06 — <b>WHITENING</b></div>
+        <div class="s4-scan"></div>
+        <svg class="glints" viewBox="0 0 1080 1350"></svg>
+        <div class="tab-ptr"></div>
+        <div class="s4-shade"><i></i>SHADE <b>A3</b></div>
+        <div class="s4-claim">UP TO <b>8 SHADES</b> WHITER<br>IN <b>ONE VISIT</b></div>
+        <div class="flash"></div>
+      </section>
+
+      <section class="slide s5" style="left:4320px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">05 / 06 — <b>THE RESULT</b></div>
+        <div class="s5-g">SMILE: <b>ON</b></div>
+        <div class="s5-look"><b>SMILE MAKEOVER</b><span>ALIGNERS / WHITENING / IMPLANTS / VENEERS</span></div>
+        <div class="whiteout"></div>
+      </section>
+
+      <section class="slide s6" style="left:5400px">
+        <div class="brand">PEARL<i>/</i>LAB</div>
+        <div class="meta">06 / 06 — <b>BOOK</b></div>
+        <div class="s6-kicker">NEW PATIENTS — 3D SMILE SCAN</div>
+        <div class="s6-first">FIRST SCAN</div>
+        <div class="s6-free">FREE</div>
+        <div class="s6-cta"><i></i>BOOK IN 60 SECONDS — LINK IN BIO</div>
+        <div class="flash"></div>
+      </section>
+
+      <div id="grain"></div>
+      <div id="seamlines"><i style="left:1080px"></i><i style="left:2160px"></i><i style="left:3240px"></i><i style="left:4320px"></i><i style="left:5400px"></i></div>
+    </div>
+  </div>
+  <div id="ui">
+    <span class="logo">PEARL/LAB</span>
+    <div class="grp">
+      <button data-view="strip" title="S">STRIP</button>
+      <button data-view="1">01</button><button data-view="2">02</button><button data-view="3">03</button>
+      <button data-view="4">04</button><button data-view="5">05</button><button data-view="6">06</button>
+    </div>
+    <button id="play" title="Space">❚❚</button>
+    <input id="scrub" type="range" min="0" max="7.999" step="0.001" value="0">
+    <span id="tread">0.00s</span>
+    <button id="seamsBtn" title="G">SEAMS</button>
+    <button id="oneBtn" title="O">1:1</button>
+    <button id="sndBtn" title="M">SOUND</button>
+    <button id="clean" title="R">REC MODE</button>
+    <span class="hint">← → swipe · M sound · R rec · F full</span>
+  </div>
+</div>
+<div id="loading"><span>LOADING</span><b>…</b></div>
+<script>/*APP*/</script>
+</body>
+</html>

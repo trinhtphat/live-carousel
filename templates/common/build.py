@@ -96,15 +96,52 @@ def rgb(h):
 
 
 def apply_theme(html, colors):
+    substitutions = {}
     for key, base in BASE.items():
         new = colors.get(key)
         if not new or new.lower() == base:
             continue
-        html = re.sub(re.escape(base), new, html, flags=re.I)
+        token = f"__LC_COLOR_{key.upper().replace('-', '_')}__"
+        html = re.sub(re.escape(base), token, html, flags=re.I)
+        substitutions[token] = new
         r, g, b = rgb(base)
         nr, ng, nb = rgb(new)
-        html = re.sub(rf"rgba\(\s*{r}\s*,\s*{g}\s*,\s*{b}\s*,", f"rgba({nr}, {ng}, {nb},", html)
+        rgba_token = token + 'RGBA'
+        html = re.sub(rf"rgba\(\s*{r}\s*,\s*{g}\s*,\s*{b}\s*,", rgba_token, html)
+        substitutions[rgba_token] = f"rgba({nr}, {ng}, {nb},"
+    for token in sorted(substitutions, key=len, reverse=True):
+        html = html.replace(token, substitutions[token])
     return html
+
+
+def apply_typography(html, typography, font_css_path):
+    """Alias installed font faces without renaming their asset URLs or originals."""
+    if not typography:
+        return html
+    typography = dict(typography)
+    if typography.get('serif') == 'Instrument Serif' and re.search(r'[ĂăĐđĨĩŨũƠơƯư\u1ea0-\u1ef9]', html):
+        typography['serif'] = 'Fraunces Vietnamese'
+    css = font_css_path.read_text(encoding='utf-8')
+    original_faces = []
+    def hold(match):
+        original_faces.append(match.group(0))
+        return f'__LC_FACE_{len(original_faces)-1}__'
+    html = re.sub(r'@font-face\s*\{[^}]+\}', hold, html)
+    aliases = []
+    for role, old, alias in [('display','Anybody','LCDisplay'),('serif','Fraunces','LCSerif'),('mono','JetBrains Mono','LCMono')]:
+        family = typography.get(role)
+        if not family:
+            continue
+        faces = [m.group(0) for m in re.finditer(r'@font-face\s*\{[^}]+\}',css)
+                 if re.search(r'font-family:\s*[\"\']'+re.escape(family)+r'[\"\']',m.group(0))]
+        if not faces:
+            raise ValueError(f'Font not bundled: {family}')
+        aliases.extend(re.sub(r'(font-family:\s*)[\"\']'+re.escape(family)+r'[\"\']',r'\1"'+alias+'"',face) for face in faces)
+        html = html.replace(old,alias)
+    for i, face in enumerate(original_faces):
+        html = html.replace(f'__LC_FACE_{i}__',face)
+    styles = '\n'.join(aliases)
+    return html.replace('</head>',f'<style>{styles}</style></head>') if '</head>' in html else html+'\n'+styles
 
 
 def silent_wav(path, seconds, sr=48000):
@@ -150,14 +187,18 @@ def main():
         cues = cues_all.get(name, {})
         html = html.replace("/*@CUES@*/ {}", json.dumps(cues)).replace("@DUR@", f"{cues.get('dur', 6):g}")
         html = apply_theme(html, colors)
+        # Finished photos retain their original design; typography affects motion only.
+        if json.loads(read(ROOT / "carousel.json") or "{}").get("mode") != "photo":
+            html = apply_typography(html, theme.get('typography', {}), SHARED / 'fonts.css')
         if premium_bridge:
             html = html.replace("<head>", "<head>\n" + PREMIUM_BRIDGE, 1)
         dest = ROOT / "slides" / name
         assets = dest / "assets"
         (assets / "fonts").mkdir(parents=True, exist_ok=True)
         (dest / "index.html").write_text(html, encoding="utf-8")
-        for f in (SHARED / "fonts").glob("*.woff2"):
-            shutil.copy2(f, assets / "fonts" / f.name)
+        for f in (SHARED / "fonts").iterdir():
+            if f.suffix.lower() in ('.woff2', '.woff', '.ttf', '.otf', '.txt'):
+                shutil.copy2(f, assets / "fonts" / f.name)
         layer_dir = ROOT / "assets" / name
         if layer_dir.is_dir():
             for f in layer_dir.iterdir():

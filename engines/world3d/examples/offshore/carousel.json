@@ -1,0 +1,15 @@
+{
+ "title": "OFFSHORE SURF CO. \u2014 QUIVER 01: SWELL (surf shop)",
+ "html": "dist/offshore-swell.html",
+ "slides": [
+  "01-swell",
+  "02-board",
+  "03-build",
+  "04-quiver",
+  "05-send",
+  "06-drop"
+ ],
+ "loop": 8,
+ "fps": 30,
+ "bpm": 120
+}
