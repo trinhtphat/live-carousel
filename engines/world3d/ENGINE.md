@@ -19,16 +19,16 @@ image tool the user has connected) is optional, used ONLY after the user sees th
 ## 0. Setup only this engine
 Use Node 22+, ffmpeg/ffprobe, Chrome/Chromium, and Python with numpy/Pillow. On Windows use native Python and npm; the Bash setup scripts are optional Unix helpers, not a requirement. Do not install every engine or ACE-Step. See `../../references/world-modes.md`.
 
-## 1. Intake (in the router's one message, plus these)
-Brand + what it sells · 2–4 hero products (photos? links?) · the **world**: one place the whole carousel lives in,
+## 1. Intake (after the shared topic and mode gates)
+Follow `../../SKILL.md` and ask only unanswered questions one at a time. Gather brand + what it sells · 2–4 hero products (photos? links?) · the **world**: one place the whole carousel lives in,
 that suits the brand and can run through every seam (stage, ocean, lab, kitchen, forest, city at night, a giant
 product…) · the drop / offer / CTA (date, comment keyword, link) · brand colours + vibe · sound (a track they own,
 an original score made locally if the machine can, or the soft synth bed) · assets budget ($0 or AI, with the cost).
 
-## 2. Concept → ONE confirmation
-Read `references/concept.md`. Write `BRIEF.md` in the project: the world, then 6 slides — hook (the world + the
+## 2. Concept → separate brief and storyboard approvals
+Read `references/concept.md`. Approve `BRIEF.md` first. Then write `STORYBOARD.md` and `ASSET_PLAN.md` in the project: the world, then 6 slides — hook (the world + the
 promise), 3–4 product slides (each product does something only it can do, one big moment per slide on ~4.0 s), the
-hero/finale (everything together), the drop/CTA — with what crosses each seam. Show the table, ask "Build it?".
+hero/finale (everything together), the drop/CTA — with what crosses each seam. Show the storyboard and image plan for separate approval. If images must be generated, approve one sample image before batch generation.
 
 ## 3. Build
 ```text
@@ -50,7 +50,7 @@ Read `references/sound.md` and `../../references/audio-integration.md`. Set `aud
 ## 5. QA → render → deliver
 `references/qa.md`. `node tools/sheet.mjs` (rows = slides; first and last column must match), `node tools/seams.mjs`
 (things line up across every seam), `node tools/shots.mjs qa "3:4.15"` (full size + page errors). Fix, repeat.
-Then `node build.mjs && node tools/render.mjs all && node tools/mux.mjs` → `renders/final/slide-*.mp4`
+For cover review, run `node build.mjs`, `python tools/make_audio.py <cover-name>`, `node tools/render.mjs 1`, and `node tools/mux.mjs 1 --draft`. Show the complete `renders/draft/slide-<cover-name>.mp4` with sound and wait for approval. Then finish every slide and run `python tools/make_audio.py`, `node build.mjs && node tools/render.mjs all && node tools/mux.mjs` → `renders/final/slide-*.mp4`
 (~10–20 s per slide on an M-series Mac), optionally `node tools/swipe.mjs` (a preview of swiping through).
 Deliver: the 6 MP4s in posting order, `dist/<name>.html`, the caption + CTA, and what it cost.
 

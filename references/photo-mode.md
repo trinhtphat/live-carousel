@@ -1,6 +1,6 @@
 # Current audio contract
 
-Use audio-integration.md for audio. Photo hit/shine cues map to gentle synthetic events by default. Legacy boom/crash recipes below describe possible custom effects only; they never override the approved profile, manifest or two-track mixer.
+Use audio-integration.md for audio. Each Photo slide needs at least one registered licensed library SFX tied to its hit/shine or another named visual cue; gentle synthetic events can supplement that effect. Keep BGM below the library SFX at its cue. Legacy boom/crash recipes below describe possible custom effects only; they never override the approved profile, manifest or two-track mixer.
 
 # Photo mode: bring finished slides to life
 

@@ -1,25 +1,21 @@
 # Intake — the interview
 
-Better carousels come from better inputs. Ask before you design. (The router SKILL.md has already picked this
-engine.) Send ONE message with the questions
-below (numbered, short, each with its default in brackets). Skip any question the user already
-answered. Tell them they can reply in one line per number, or just say "defaults".
+The core `SKILL.md` controls the order and human review gates. Use these questions as an engine-specific checklist after the selected topic and image inventory have led to World 2D. Ask only the important unanswered questions, using the brainstorming skill's focused one-at-a-time method. The bracketed examples are starting points, never assumed approvals.
 
 ```
-Before I build, 8 quick questions (one line each is plenty — or say "defaults"):
+Possible World 2D questions:
 
 1. Your business — name, what you sell, who it's for. Website or Instagram handle if you have one (I'll look).
-2. Topic — do you have one (a launch, offer, tip, story, event)? Or should I find 3 angles for you to pick? [I find 3]
+2. Topic — use the owner's already selected whole-carousel topic. If no topic is selected, return to the core 5–10 numbered-topic gate.
 3. Goal — what should people do after the last slide? (order / DM a keyword / link in bio / book / follow) Any price, offer or date?
-4. Budget — $0 (everything drawn in code, free) or AI assets (photoreal product shots or hero images via Higgsfield or another AI tool you've connected, costs credits — I'll show you the cost before spending)? [$0]
-5. Real images — product photos, logo, screenshots, photos of you or your place? Give me the folder. [none: I draw everything]
+4. Budget — code-drawn assets or generated images? Record the owner's choice and disclose costs before paid generation.
+5. Real images — use the owner's image inventory from the core workflow; ask only if an asset is still unclear.
 6. Style — brand colours/fonts, a brand guide / style sheet, or posts / carousels / accounts you love (files or links)? [I pick a look for your business]
 7. Format — how many slides, which platform, how long each loop? [6 slides · Instagram 4:5 (1080×1350) · 8 s]
 8. Words — language and tone, plus anything you must say or must never say (claims, legal lines, words to avoid)? [your language · punchy]
 ```
 
-If the client has the AskUserQuestion tool, you may ask 2 (topic), 4 (budget) and 7 (format) as
-multiple-choice there and the rest in plain text, but keep it to one round.
+Record decisions in the brief and image plan. Obtain their separate approvals, then one generated-image sample approval if applicable, before building the complete cover draft. Show that draft for approval before rendering all slides.
 
 ## How each answer changes the build
 
@@ -29,8 +25,7 @@ a gym slams and pulses; a skincare brand drips and glows) and the world colours.
 handle, read it for product names, prices, tone of voice and real claims. Never invent prices,
 awards, reviews or claims; put a `[CHECK]` placeholder and ask.
 
-**2 · Topic.** If they have one, sharpen it into one promise. If they want you to find it, propose 3
-angles, each with a hook line and why it works for their audience, then let them pick:
+**2 · Topic.** Preserve the topic selected through the core 5–10-topic gate. The following are examples of story angles when preparing that list:
 - Launch / new item ("Something hot is coming") · Process / behind the scenes ("How we build it, layer by layer")
 - Offer with urgency ("This weekend only") · Myth vs truth · Before → after / transformation
 - Ranked list ("3 things every … needs") · Story of a customer · Seasonal / cultural moment.
@@ -40,13 +35,13 @@ Prefer the angle that gives the protagonist the most to *do* across the slides.
 DM keyword, a "link in bio" arrow, a booking date. One CTA only. Repeat the offer once earlier.
 
 **4 · Budget.**
-- `$0` (default): the protagonist is drawn in code like the example burger (gradients, layered shapes,
-  material angles so it can turn). This is free forever and looks illustrated-premium.
+- `code-drawn`: the protagonist can be drawn in code like the example burger (gradients, layered shapes,
+  material angles so it can turn). Document the resulting style in the image plan.
 - `AI assets`: follow `references/assets.md` (Higgsfield recipe). Check the connector is available
   (its tools appear in your tool list). If not, tell the user how to connect it — in Claude Desktop /
   claude.ai: Settings → Connectors → add Higgsfield and sign in; in Claude Code: add the connector or MCP
   server the tool documents — and wait. List every asset you plan to make with its credit cost; get a
-  yes before the first paid call. Never upscale or re-roll without asking.
+  yes before the first paid call. Follow the core one-sample image approval before generating a batch.
 - If they name another tool (any AI image/video tool they have connected), use it the same way:
   generate → cut out → drop PNGs into `assets/`.
 
@@ -68,4 +63,4 @@ loop 4, 6 or 8 s (whole bars at 120 BPM so music syncs later).
 **8 · Words.** Write all on-slide copy in their language and tone. Keep slides to ≤ 8 big words plus a
 small line. Put must-say lines on the CTA slide; respect must-never-say lists everywhere.
 
-After the answers: write `BRIEF.md`, fill its slide-plan table, show plan + copy, ask "Build it?" once.
+After the answers: follow the separate brief, storyboard/image-plan, sample-image (when needed) and complete-cover approval gates in `SKILL.md`.

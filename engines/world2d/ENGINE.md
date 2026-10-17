@@ -15,19 +15,16 @@ chooses them in the intake, and you always show the credit cost and wait for a y
 ## 0. Setup only this engine
 Use Node 22+, Python with numpy, ffmpeg/ffprobe and Chrome/Chromium/Edge. Windows can run Python and Node directly; Bash setup is an optional Unix helper. Do not install unrelated engines. Follow `../../references/world-modes.md`; report missing dependencies rather than claiming tests passed.
 
-## 1. Intake — interview the user BEFORE designing anything
-Read `references/intake.md`. Ask the 8 questions in ONE message (numbered, each with its default in
-brackets, skip any the user already answered): business · topic (theirs, or you find 3) · goal + CTA ·
-budget ($0 or AI assets) · real images · style reference · format · words. Wait for the answers.
+## 1. Intake — follow the shared Human review route
+Read `../../SKILL.md` first, then `references/intake.md`. Ask important unanswered questions one at a time about business, goal, audience, available images, style, format, words and budget. For a broad idea, research and offer 5–10 numbered whole-carousel topics; wait for the chosen number before mode selection.
 "Use the defaults" / "just go" is a valid answer. If they choose AI assets and the tool is not
 connected, explain exactly how to connect it and wait. If they give a website or IG handle, look at it.
 Write the answers into the project's `BRIEF.md` (template: `references/brief-template.md`).
 
-## 2. Concept — one screen, one confirmation
-Read `references/direction.md`. Fill the slide-plan table in `BRIEF.md`: for each slide its role, world
+## 2. Concept — separate brief and storyboard approvals
+Read `references/direction.md`. Approve the production brief first. Then fill the slide-plan table in `STORYBOARD.md`: for each slide its role, world
 colour, hero technique, ONE big moment plus a second beat mid-loop, typography treatment, and the
-seam bridge to the next slide. Write the on-slide copy. Show the plan + copy to the user and ask
-"Build it?" once (skip if they said "just go"). The variety contract is non-negotiable:
+seam bridge to the next slide. Write the on-slide copy and image plan. Show both to the user and wait for separate approval before building. If images must be generated, approve one sample image before making the rest. The variety contract is non-negotiable:
 - No two slides share a typography treatment or a hero technique; neighbours never share a background.
 - Every slide: at least 3 things moving at all times, real easing (squash/stretch, overshoot, bounce),
   an impact moment (shake / flash / shockwave), and depth (back / mid / front layers at different speeds).
@@ -60,8 +57,8 @@ Read `references/qa.md`. Loop until it passes:
   text just fades in, push it further and re-check. Check copy is spelled right and readable at phone size.
 
 ## 5. Render, sound, deliver
-Run `node tools/capture.mjs video renders all`, then `python ENGINE/scripts/add_sound.py <project>`. The adapter extracts actual shake/flash times, writes the visual-trigger map to `audio/plan.json`, and calls the common normalized BGM/SFX pipeline. Final videos are written separately to `renders/final/`.
-Edit per-slide `audio` options in the plan for licensed BGM or manifest-backed SFX. All library SFX live in `assets/sfx/` and are registered in root `sfx_manifest.json`. The default is Subtle/Smooth. Explicit Game/Tech/Cinematic requests in BRIEF.md enable custom styles; beep/click sounds are not banned and are normalized before mixing. See `../../references/audio-integration.md`.
+For cover review, run `node tools/capture.mjs video renders/draft/raw "1"`, then `python ENGINE/scripts/add_sound.py <project> --only slide-01 --video-dir renders/draft/raw --output-dir renders/draft`. Show `renders/draft/slide-01.mp4` with sound and wait for approval. After approval, render all raw slides with `node tools/capture.mjs video renders all`, then run `python ENGINE/scripts/add_sound.py <project>`; final videos are written to `renders/final/`.
+Edit per-slide `audio` options in the plan for BGM and at least one licensed, manifest-backed SFX on every slide. All library SFX live in `assets/sfx/` and are registered in root `sfx_manifest.json`. The default is Subtle/Smooth. Explicit Game/Tech/Cinematic requests in BRIEF.md enable custom styles; beep/click sounds are not banned and are normalized before mixing. See `../../references/audio-integration.md`.
 Deliver verified MP4 paths, HTML, caption and CTA. Inspect actual rendered frames and seams; imported example quality is not evidence of a new render passing QA.
 
 ## Rules that keep it correct (and why)

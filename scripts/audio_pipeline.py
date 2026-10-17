@@ -87,6 +87,27 @@ def write_wav(path, x):
         f.setnchannels(2); f.setsampwidth(2); f.setframerate(SR)
         f.writeframes((x * 32767).astype('<i2').tobytes())
 
+def duck_bgm(bgm: np.ndarray, sfx: np.ndarray, event_windows: list[tuple[int, int]]) -> np.ndarray:
+    """Make music secondary during each real SFX event, with smooth edge ramps."""
+    n = len(bgm)
+    gain = np.ones(n)
+    attack = round(.02 * SR)
+    release = round(.12 * SR)
+    for start, end in event_windows:
+        if end <= start: continue
+        sfx_rms = float(np.sqrt(np.mean(sfx[start:end] ** 2)))
+        bgm_rms = float(np.sqrt(np.mean(bgm[start:end] ** 2)))
+        target = min(1.0, .45 * sfx_rms / bgm_rms) if bgm_rms else 1.0
+        gain[start:end] = np.minimum(gain[start:end], target)
+        if target < 1:
+            for offset in range(1, attack + 1):
+                idx = (start - offset) % n
+                gain[idx] = min(gain[idx], target + (1 - target) * offset / attack)
+            for offset in range(release):
+                idx = (end + offset) % n
+                gain[idx] = min(gain[idx], target + (1 - target) * (offset + 1) / release)
+    return bgm * gain[:, None]
+
 def render_audio(root, duration, visual_triggers, audio, output_prefix):
     root = Path(root).resolve()
     duration = number(duration, 'duration', 0.01)
@@ -119,6 +140,8 @@ def render_audio(root, duration, visual_triggers, audio, output_prefix):
         bgm[:fade] *= np.linspace(0,1,fade)[:,None]
         bgm[-fade:] *= np.linspace(1,0,fade)[:,None]
     sfx = np.zeros((n,2))
+    event_windows = []
+    library_events = 0
     for event in audio.get('events',[]):
         trigger = event.get('trigger')
         if trigger not in visual_triggers: raise ValueError('Every SFX must reference an existing visual trigger')
@@ -144,13 +167,26 @@ def render_audio(root, duration, visual_triggers, audio, output_prefix):
             sample = np.repeat((np.sin(2*np.pi*330*st)*np.sin(np.pi*st/.18)**2)[:,None],2,axis=1)
             gain = min(number(event.get('gain',.08),'SFX gain',0,1),1 if custom else .15)
         sample = normalize(sample,gain)
+        if not np.any(sample):
+            raise ValueError('A silent SFX cannot satisfy the library SFX requirement')
         start = round(when*SR)
         # Wrap tails to preserve loop length. Timing remains anchored to its visual trigger.
         np.add.at(sfx, (start+np.arange(len(sample))) % n, sample)
+        if 'sfx' in event:
+            library_events += 1
+            if len(sample) >= n:
+                event_windows.append((0, n))
+            elif start + len(sample) <= n:
+                event_windows.append((start, start + len(sample)))
+            else:
+                event_windows.extend(((start, n), (0, (start + len(sample)) % n)))
+    if not library_events:
+        raise ValueError('At least one registered library SFX is required per slide')
     # Attenuate sums, never boost quiet beds. Preserve stem additivity.
     sfx_peak = np.max(np.abs(sfx))
     cap = .22 if not custom else CEILING
     if sfx_peak > cap: sfx *= cap/sfx_peak
+    bgm = duck_bgm(bgm, sfx, event_windows)
     mix = bgm+sfx
     peak = max(np.max(np.abs(mix)),np.max(np.abs(bgm)),np.max(np.abs(sfx)))
     if peak > CEILING:

@@ -13,15 +13,15 @@ World 3D: `python <skill>/engines/world3d/scripts/new_carousel.py <encore|offsho
 
 Both scaffolds copy the common audio pipeline into project `audio/` and create isolated `assets/sfx/` with root `sfx_manifest.json`. Every imported audio asset, including BGM, must be registered with provenance and license status. BGM entries use category_group `bgm`. Unknown rights block use; user-provided does not mean royalty-free. See `audio-integration.md`.
 
-World 2D: run `python <skill>/engines/world2d/scripts/add_sound.py <project>`. Real shake/flash times from the visual engine become trigger IDs. The adapter writes `audio/plan.json`; edit its per-slide audio configuration to customize sounds.
+World 2D: real shake/flash times from the visual engine become trigger IDs. Before rendering audio, fill `audio/plan.json` with at least one registered, licensed library SFX per slide and a BGM choice; the adapter no longer supplies synthetic-only production audio. For the approved cover, run `node tools/capture.mjs video renders/draft/raw "1"`, then `python <skill>/engines/world2d/scripts/add_sound.py <project> --only slide-01 --video-dir renders/draft/raw --output-dir renders/draft`. Show the complete `renders/draft/slide-01.mp4` and wait for owner approval. For final production, render all raw slides and run `add_sound.py <project>` with complete plans.
 
 World 3D: edit `audio/plan.json` to match event times in the slide modules, then run `python tools/make_audio.py` from the project. Each slide entry has `visual_triggers` and `audio`, for example:
 
 ```json
-{"slides":{"01-hook":{"visual_triggers":{"headline-reveal":1.2},"audio":{"profile":"subtle","events":[{"trigger":"headline-reveal","synthetic":"soft"}]}}}}
+{"slides":{"01-hook":{"visual_triggers":{"headline-reveal":1.2},"audio":{"profile":"subtle","events":[{"trigger":"headline-reveal","sfx":"effects/path.wav"}]}}}}
 ```
 
-Use actual slide names from carousel.json. The scaffolder's empty event maps deliberately make no assumptions about the rewritten visuals. Default Subtle/Smooth; Game/Tech/Cinematic require explicit request in BRIEF.md plus `custom_style_requested: true`. Custom beep/click sounds remain available with normalization. Preserve distinct `.bgm.wav` and `.sfx.wav` stems and the normalized `.wav` mix. Final mux is protected with a limiter; world3d refuses missing stems and never falls back to old example audio.
+Use actual slide names from carousel.json and a manifest-registered file for `sfx`. The scaffolder's empty event maps deliberately make no assumptions about the rewritten visuals. For the complete cover draft, run `python tools/make_audio.py <cover-name>`, `node tools/render.mjs 1`, then `node tools/mux.mjs 1 --draft`. Show `renders/draft/slide-<cover-name>.mp4` and wait for approval. Then fill all slide plans and run the no-argument audio, all-slide render and mux commands for final production. Default Subtle/Smooth; Game/Tech/Cinematic require explicit request in BRIEF.md plus `custom_style_requested: true`. Custom beep/click sounds remain available with normalization. Preserve distinct `.bgm.wav` and `.sfx.wav` stems and the normalized `.wav` mix. Final mux is protected with a limiter; world3d refuses missing stems and never falls back to old example audio.
 
 Imported combined-score generators are retained for study only; production must use the common pipeline. Original demo WEBM mixes are excluded so they cannot be mistaken for approved reusable library assets. Preview HTML is silent until its audio embedding is explicitly wired to the normalized outputs; the final MP4 mux is the production audio path.
 

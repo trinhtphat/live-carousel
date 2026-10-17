@@ -1,6 +1,8 @@
 # Live Carousel
 
-Portable skill for producing looping video carousels in GPT/Codex, Claude and Gemini. Start with [SKILL.md](SKILL.md) and the matching guide in `adapters/`. Confirm the topic and production brief before rendering.
+Portable skill for producing looping video carousels in GPT/Codex, Claude and Gemini. Start with [SKILL.md](SKILL.md) and the matching guide in `adapters/`. The human review path is: focused research/questions → 5–10 numbered topics and owner selection → image inventory → production mode → approved brief → separately approved storyboard and image plan → one approved generated-image sample when needed → one complete cover/hook draft approved with animation and sound → full final render.
+
+The complete Vietnamese workflow, review gates and mode-specific draft commands are in [docs/workflow-human-review.vi.md](docs/workflow-human-review.vi.md).
 
 [Watch the rendered demo](https://github.com/user-attachments/assets/2ae5f935-f42b-4e05-8f8c-081a410d37d3) · [Open the MP4](media/demo-carousel.mp4) · [View the poster](media/demo-poster.jpg)
 
@@ -10,7 +12,7 @@ The skill supports four modes: editable Motion slides, animation of finished Pho
 
 Audio is registered in [sfx_manifest.json](sfx_manifest.json) and stored under `assets/sfx/`. The library contains 133 SFX and 17 music tracks from `sound-effects-pack.zip`; 56 files matched previously registered assets by SHA-256, so the ZIP added 94 files. The user confirmed commercial-use and public redistribution rights for the entire archive on 2026-10-16. The manifest records source, category, duration, volume, hash and rights evidence for each file.
 
-Read [audio integration](references/audio-integration.md) before changing sound design. SFX follow named visual triggers and render to a separate stem from music. Defaults are Subtle/Smooth; use Game, Tech or Cinematic only when the approved brief calls for them. The mixer checks registration and rights before playback.
+Read [audio integration](references/audio-integration.md) before changing sound design. Every slide needs at least one audible licensed library SFX following a named visual trigger. Music stays below SFX during those events, and the two tracks have separate stems. Defaults are Subtle/Smooth; use Game, Tech or Cinematic only when the approved brief calls for them. The mixer checks registration and rights before playback.
 
 ## Local use
 

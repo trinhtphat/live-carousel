@@ -1,15 +1,28 @@
 # Render, QA, troubleshooting, posting
 
+## Human review: complete cover draft
+
+After the production brief, storyboard, image plan and any required generated-image sample have been approved, finish the cover/hook slide with its registered library SFX and BGM. For Motion/Photo, render only that slide with:
+
+```text
+python scripts/render_all.py <project> --draft --only <cover-slide-name>
+```
+
+The review MP4, contact sheet, loop seam and swipe preview are under `<project>/renders/draft/`. Open the MP4 with sound and inspect the visual trigger, SFX prominence, text legibility and loop. Show the actual complete cover to the owner and wait for explicit approval. A draft does not populate or replace `renders/slide-*.mp4`. On requested revisions, update the affected source and repeat the cover review. Render the full final carousel only after cover approval.
+
+New Motion/Photo projects copy the cover-selective `audio/make_audio.py` and `audio/project_audio.py` helpers from this skill. For a project scaffolded before this update, refresh those two helpers from the matching `templates/<mode>/audio/` and `templates/common/audio/` paths before using `--draft`; this keeps unfinished later-slide audio plans out of the cover render.
+
 ## QA checklist (look at the images; don't assume)
 
 - [ ] `renders/contact-sheet.jpg` top row: every slide's frame 0 is a finished, readable design.
-      In photo mode it is identical to the original slides.
+      In photo mode compare the normalized crop against the original and approve any crop.
 - [ ] The bottom row (mid-slide): the big moment is visible, nothing is clipped or off-canvas, and no
       text collides with anything by accident.
 - [ ] `renders/seams/*.jpg` (last frame | first frame): they look like consecutive frames. No pop,
       and no element that appears or vanishes at the loop.
 - [ ] Every MP4 has `audio`, and its duration is exactly the slide's `dur` (render_all prints both).
 - [ ] Sound lines up with picture. Open `preview.html`, tap "play with sound", and watch the hits land.
+- [ ] Every slide has at least one audible, licensed library SFX tied to a visual event; BGM remains below the SFX during its event.
 - [ ] Top-right and bottom-right corners are clear of important content (Instagram's own overlays).
 - [ ] Copy check: spelling, the counters (`01 / 04`), the CTA keyword is the same in caption and slide.
 - [ ] Continuity: the protagonist leaves slide N on the right and enters slide N+1 from the left.

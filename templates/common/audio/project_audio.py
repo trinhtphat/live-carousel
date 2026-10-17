@@ -12,13 +12,18 @@ MOTION_DEMO = {
     '04-cta': (8, {'ball-land': .5, 'snap': 1, 'post-click': 3}),
 }
 
-def render_project(root):
+def render_project(root, only=None):
     root = Path(root)
     cfg = json.loads((root / 'carousel.json').read_text(encoding='utf-8-sig'))
     audio = cfg.get('audio', {})
     if cfg.get('music'):
         raise ValueError('Migrate music to audio.bgm and register its file in assets/sfx + sfx_manifest.json')
-    for name in cfg.get('slides', []):
+    slides = cfg.get('slides', [])
+    if only is not None and only not in slides:
+        raise ValueError(f'Unknown audio slide: {only}')
+    for name in slides:
+        if only is not None and name != only:
+            continue
         cue = cfg.get('cues', {}).get(name, {})
         duration = cue.get('dur', MOTION_DEMO.get(name, (6, {}))[0])
         triggers = cfg.get('visual_triggers', {}).get(name)

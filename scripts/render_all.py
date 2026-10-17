@@ -3,12 +3,14 @@
 
   py render_all.py [project-dir] [--only 01-hook 03-weight] [--workers 2] [--quality looks]
                    [--no-audio] [--no-check] [--check-only]
+  py render_all.py [project-dir] --draft --only 01-hook
 
 Outputs, all inside the project:
   renders/slide-<name>.mp4     one 1080x1350 30 fps MP4 per slide, sound included (what you post)
   renders/contact-sheet.jpg    top row = frame 0 of every slide, bottom row = mid-slide
   renders/seams/<name>.jpg     last frame | first frame, to eyeball the loop seam
   preview.html                 local Instagram-style swipe preview of the renders
+  renders/draft/               isolated one-slide review artifacts with --draft
 """
 import argparse
 import html
@@ -65,6 +67,7 @@ def main():
     ap.add_argument("--no-audio", action="store_true")
     ap.add_argument("--no-check", action="store_true")
     ap.add_argument("--check-only", action="store_true", help="build and check, no render")
+    ap.add_argument("--draft", action="store_true", help="render exactly one slide under renders/draft for human review")
     ap.add_argument("--renderer", choices=("hyperframes", "premium"), default="hyperframes",
                     help="video renderer; premium uses the user's Premium Motion Video toolkit")
     ap.add_argument("--premium-toolkit", default=os.environ.get("PREMIUM_MOTION_TOOLKIT"),
@@ -81,12 +84,16 @@ def main():
     cfg_path = proj / "carousel.json"
     cfg = json.loads(cfg_path.read_text(encoding="utf-8")) if cfg_path.exists() else {}
     slides = cfg.get("slides") or sorted(p.stem for p in (proj / "src").glob("*.html") if not p.stem.startswith("_"))
+    if a.draft and (len(a.only) != 1 or a.only[0] not in slides):
+        ap.error("--draft requires exactly one valid slide named with --only")
     todo = [s for s in slides if not a.only or s in a.only]
+    renders = proj / "renders" / "draft" if a.draft else proj / "renders"
     py = sys.executable
 
     if not a.no_audio and (proj / "audio/make_audio.py").exists():
         print("» audio")
-        if run([py, "make_audio.py"], proj / "audio"):
+        audio_cmd = [py, "make_audio.py", *([todo[0]] if a.draft else [])]
+        if run(audio_cmd, proj / "audio"):
             sys.exit("audio/make_audio.py failed")
     print("» build")
     build_args = [py, "build.py", *(["--premium-bridge"] if a.renderer == "premium" else []), *todo]
@@ -103,7 +110,6 @@ def main():
             sys.exit(f"check failed for: {', '.join(failed)}. Fix the errors above, then run again.")
     if a.check_only:
         if a.renderer == "premium":
-            renders = proj / "renders"
             renders.mkdir(parents=True, exist_ok=True)
             for s in todo:
                 page = proj / "slides" / s / "index.html"
@@ -115,7 +121,6 @@ def main():
             print("checks passed")
         return
 
-    renders = proj / "renders"
     (renders / "seams").mkdir(parents=True, exist_ok=True)
     frames = renders / ".frames"
     frames.mkdir(exist_ok=True)
@@ -148,7 +153,7 @@ def main():
 
     print("» verify")
     ok_all = True
-    for s in slides:
+    for s in todo if a.draft else slides:
         out = renders / f"slide-{s}.mp4"
         if not out.exists():
             continue
@@ -161,7 +166,7 @@ def main():
         frame(out, None, frames / f"{s}-last.png")
         stack([frames / f"{s}-last.png", frames / f"{s}-first.png"], renders / "seams" / f"{s}.jpg", "[0][1]hstack=inputs=2")
 
-    done = [s for s in slides if (renders / f"slide-{s}.mp4").exists()]
+    done = [s for s in (todo if a.draft else slides) if (renders / f"slide-{s}.mp4").exists()]
     if done:
         firsts = [frames / f"{s}-first.png" for s in done]
         mids = [frames / f"{s}-mid.png" for s in done]
@@ -178,7 +183,7 @@ def main():
         if tpl.exists():
             esc = html.escape
             vids = "\n".join(
-                f'          <video src="renders/slide-{s}.mp4" playsinline loop muted preload="auto"></video>' for s in done
+                f'          <video src="{"" if a.draft else "renders/"}slide-{s}.mp4" playsinline loop muted preload="auto"></video>' for s in done
             )
             dots = "".join('<i class="on"></i>' if i == 0 else "<i></i>" for i in range(n))
             page = (
@@ -190,13 +195,14 @@ def main():
                 .replace("@HANDLE@", esc(cfg.get("handle", "your_handle")))
                 .replace("@CAPTION@", esc(cfg.get("caption", "")))
             )
-            (proj / "preview.html").write_text(page, encoding="utf-8")
+            (renders / "preview.html" if a.draft else proj / "preview.html").write_text(page, encoding="utf-8")
     print()
     print(f"renders:        {renders}")
     print(f"contact sheet:  {renders / 'contact-sheet.jpg'}")
     print(f"loop seams:     {renders / 'seams'}")
-    if (proj / "preview.html").exists():
-        print(f"swipe preview:  {proj / 'preview.html'}")
+    preview = renders / "preview.html" if a.draft else proj / "preview.html"
+    if preview.exists():
+        print(f"swipe preview:  {preview}")
     for s, report in pop_warnings:
         print(f"REVIEW REQUIRED: Premium pop check flagged slide {s}; inspect {report} against intentional hits.")
     if not ok_all:
