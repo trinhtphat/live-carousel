@@ -19,3 +19,7 @@ Read [audio integration](references/audio-integration.md) before changing sound 
 Install Node.js 22+, Python 3.9+ with numpy/opencv, ffmpeg/ffprobe, and the selected renderer. The original Motion/Photo backend pins `hyperframes@0.8.121`; a Premium Motion Video renderer is optional. Read [render QA](references/render-qa.md) for checks and [VALIDATION.md](VALIDATION.md) for prior package validation. On Windows, invoke the Python scripts directly or use Bash/WSL for POSIX wrappers.
 
 Bundled fonts and third-party assets are described in [LICENSES.md](LICENSES.md). Preserve source files and the manifest when copying the skill.
+
+## Curaçao case study
+
+[Case study: 7-slide Curaçao carousel (Tiếng Việt)](docs/case-study-curacao-carousel.vi.md) records the image-first review gates, slide-by-slide feedback, audio/preview failures, seven-file delivery and the newly specified Cointreau orange `#FA4616`. The case study distinguishes this colour standard from older renders; it does not claim that those MP4s were recoloured.
